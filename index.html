@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎲 ボドゲ会の日程調整</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink: #FF6B9D;
+      --pink-dark: #d94d80;
+      --pink-light: #FFD7E5;
+      --mint: #4ECDC4;
+      --mint-dark: #3aa39c;
+      --mint-light: #D6F5F2;
+      --yellow: #FFD93D;
+      --yellow-dark: #d4b329;
+      --yellow-light: #FFF3CC;
+      --gold: #ca8a04;
+      --cream: #FFF8E7;
+      --deep: #2D3047;
+      --green: #06D6A0;
+      --green-dark: #04a87f;
+      --green-light: #D6F5E9;
+      --orange: #FF8C42;
+      --orange-dark: #d96f29;
+      --orange-light: #FFE0CC;
+      --rose: #EF476F;
+      --rose-dark: #c2375a;
+      --rose-light: #FCD5DD;
+      --text: #2D3047;
+      --text-muted: #7a7d8c;
+      --border: #F0E5EC;
+      --border-strong: #D6C5CE;
+      --bg-grad: linear-gradient(135deg, #FFE5EC 0%, #FFF5E1 50%, #E8F8F5 100%);
+      --card: #ffffff;
+    }
+
+    html, body {
+      font-family: 'M PLUS Rounded 1c', "Hiragino Maru Gothic ProN", "Yu Gothic UI", "Meiryo", sans-serif;
+      background: var(--bg-grad);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+
+    .container { max-width: 920px; margin: 0 auto; padding: 16px; position: relative; z-index: 1; }
+
+    /* App bar (pop風) */
+    .app-bar {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 3px solid var(--pink-light);
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .app-bar h1 {
+      font-size: 1.1em;
+      font-weight: 900;
+      color: var(--deep);
+      text-shadow: 2px 2px 0 var(--yellow);
+      letter-spacing: 0.02em;
+    }
+    .app-bar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* Identity bar */
+    .identity-bar {
+      background: var(--card);
+      border: 3px solid var(--mint-light);
+      border-radius: 50px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      box-shadow: 0 4px 18px rgba(255, 107, 157, 0.08);
+    }
+    .identity-bar label { font-weight: 700; font-size: 0.9em; color: var(--text); }
+    .identity-bar select {
+      flex: 1;
+      min-width: 120px;
+      padding: 7px 12px;
+      border-radius: 50px;
+      border: 2px solid var(--mint-light);
+      background: var(--cream);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.95em;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .identity-bar select:focus { outline: none; border-color: var(--mint); box-shadow: 0 0 0 3px var(--mint-light); }
+    .badge-owner {
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      color: var(--deep);
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.8em;
+      font-weight: 900;
+      box-shadow: 0 2px 6px rgba(255, 217, 61, 0.4);
+    }
+
+    /* Decided banner */
+    .decided-banner {
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      color: var(--deep);
+      padding: 14px 18px;
+      border-radius: 18px;
+      margin-bottom: 16px;
+      font-weight: 700;
+      box-shadow: 0 6px 20px rgba(255, 217, 61, 0.35);
+    }
+    .decided-banner .decided-title {
+      font-size: 0.95em;
+      margin-bottom: 8px;
+      font-weight: 900;
+    }
+    .decided-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .decided-chip {
+      background: rgba(255, 255, 255, 0.92);
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 0.88em;
+      cursor: pointer;
+      transition: transform 0.15s;
+      color: var(--deep);
+    }
+    .decided-chip:hover { transform: scale(1.06); }
+
+    /* Tabs (pop pills) */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 8px 18px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 50px;
+      font-family: inherit;
+      font-size: 0.92em;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab:hover { border-color: var(--mint); color: var(--mint-dark); }
+    .tab.active {
+      background: var(--pink);
+      border-color: var(--pink-dark);
+      color: white;
+      box-shadow: 0 4px 0 var(--pink-dark);
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border: 3px solid white;
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(255, 107, 157, 0.1);
+    }
+    .card h2 {
+      font-size: 1.1em;
+      font-weight: 900;
+      margin-bottom: 12px;
+      color: var(--deep);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .card h3 {
+      font-size: 1em;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: var(--deep);
+    }
+
+    /* Calendar header */
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .month-nav { display: flex; align-items: center; gap: 8px; }
+    .month-label {
+      font-weight: 900;
+      font-size: 1.1em;
+      min-width: 110px;
+      text-align: center;
+    }
+    .nav-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: var(--cream);
+      cursor: pointer;
+      font-size: 0.9em;
+      font-weight: 700;
+      transition: all 0.15s;
+      color: var(--deep);
+    }
+    .nav-btn:hover { background: var(--mint); color: white; transform: scale(1.08); }
+    .today-btn {
+      padding: 6px 14px;
+      border-radius: 50px;
+      border: 2px solid var(--mint);
+      background: white;
+      color: var(--mint-dark);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.85em;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .today-btn:hover { background: var(--mint); color: white; }
+
+    /* Calendar grid */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .day-header {
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.78em;
+      padding: 6px 0;
+      color: var(--text);
+      opacity: 0.7;
+    }
+    .day-header.sun { color: var(--rose); opacity: 0.85; }
+    .day-header.sat { color: #4a90d9; opacity: 0.85; }
+
+    .cal-cell {
+      aspect-ratio: 1 / 1;
+      background: #fafafa;
+      padding: 5px 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: all 0.12s;
+      border: 2px solid transparent;
+      border-radius: 10px;
+    }
+    .cal-cell:hover { transform: translateY(-2px); box-shadow: 0 5px 12px rgba(0,0,0,0.08); }
+    .cal-cell.other-month { opacity: 0.4; }
+    .cal-cell.past:not(.decided) { opacity: 0.6; }
+    .cal-cell.today { border-color: var(--mint); background: var(--mint-light); }
+    .cal-cell.decided {
+      background: linear-gradient(135deg, var(--yellow-light), var(--orange-light));
+      border-color: var(--yellow);
+    }
+    .cal-cell.my-o { box-shadow: inset 0 0 0 3px var(--green); }
+    .cal-cell.my-tri { box-shadow: inset 0 0 0 3px var(--orange); }
+    .cal-cell.my-x { box-shadow: inset 0 0 0 3px var(--rose); }
+
+    .cal-cell-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 0.78em;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .cal-cell-top.sun { color: var(--rose); }
+    .cal-cell-top.sat { color: #4a90d9; }
+    .crown { font-size: 0.9em; }
+
+    .cal-cell-stats {
+      display: flex;
+      gap: 3px;
+      font-size: 0.62em;
+      font-weight: 900;
+      flex-wrap: wrap;
+      line-height: 1.1;
+      justify-content: flex-end;
+    }
+    .stat-o, .stat-tri, .stat-x {
+      padding: 1px 5px;
+      border-radius: 6px;
+      color: white;
+    }
+    .stat-o { background: var(--green); }
+    .stat-tri { background: var(--orange); }
+    .stat-x { background: var(--rose); }
+
+    .legend {
+      margin-top: 12px;
+      font-size: 0.78em;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .legend > span > span:first-child {
+      padding: 2px 6px;
+      border-radius: 6px;
+      margin-right: 4px;
+      color: white;
+      font-weight: 700;
+    }
+
+    /* ============ Table view ============ */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      background: white;
+      border: 2px solid var(--border);
+    }
+    .schedule-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.92em;
+      min-width: 480px;
+    }
+    .schedule-table th, .schedule-table td {
+      padding: 10px 12px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .schedule-table thead th {
+      background: var(--cream);
+      font-weight: 900;
+      font-size: 0.88em;
+      color: var(--deep);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    .schedule-table .date-col {
+      text-align: left;
+      font-weight: 700;
+      white-space: nowrap;
+      min-width: 130px;
+      background: white;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      border-right: 2px solid var(--border);
+    }
+    .schedule-table thead th.date-col { background: var(--cream); z-index: 3; }
+    .schedule-table .date-col.decided { background: linear-gradient(135deg, var(--yellow-light), var(--orange-light)); }
+    .schedule-table .date-col.past { color: var(--text-muted); }
+    .schedule-table .date-col.sun { color: var(--rose); }
+    .schedule-table .date-col.sat { color: #4a90d9; }
+    .schedule-table tbody tr { cursor: pointer; transition: background 0.1s; }
+    .schedule-table tbody tr:hover { background: #fffbf2; }
+    .schedule-table tbody tr:hover .date-col { background: #fffbf2; }
+    .schedule-table tbody tr:hover .date-col.decided { background: linear-gradient(135deg, #FFF3CC, #FFE0CC); }
+    .schedule-table tbody tr:last-child td { border-bottom: none; }
+    .schedule-table .mark { font-size: 1.15em; font-weight: 900; }
+    .schedule-table .mark-o { color: var(--green); }
+    .schedule-table .mark-tri { color: var(--orange); }
+    .schedule-table .mark-x { color: var(--rose); }
+    .schedule-table .mark-none { color: #d1d5db; }
+    .schedule-table .summary-cell {
+      font-size: 0.78em;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .schedule-table .summary-cell span { margin: 0 2px; padding: 1px 5px; border-radius: 6px; color: white; }
+    .schedule-table .summary-cell span.mark-o { background: var(--green); color: white; }
+    .schedule-table .summary-cell span.mark-tri { background: var(--orange); color: white; }
+    .schedule-table .summary-cell span.mark-x { background: var(--rose); color: white; }
+    .table-empty {
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9em;
+    }
+
+    /* Suggestions list */
+    .suggestion-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--cream);
+      border-radius: 14px;
+      margin-bottom: 8px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .suggestion-item:last-child { margin-bottom: 0; }
+    .suggestion-info { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
+    .suggestion-date { font-weight: 900; font-size: 1em; }
+    .suggestion-stats { display: flex; gap: 6px; font-size: 0.82em; }
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 2px 8px;
+      border-radius: 50px;
+      font-weight: 900;
+      color: white;
+    }
+    .stat-pill.o { background: var(--green); }
+    .stat-pill.tri { background: var(--orange); }
+    .stat-pill.x { background: var(--rose); }
+    .suggestion-actions { display: flex; gap: 6px; }
+
+    /* Buttons (chunky pop) */
+    .btn {
+      padding: 9px 18px;
+      border-radius: 50px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.92em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      user-select: none;
+      line-height: 1.2;
+    }
+    .btn-sm { padding: 7px 14px; font-size: 0.86em; }
+    .btn-primary {
+      background: var(--pink);
+      color: white;
+      box-shadow: 0 4px 0 var(--pink-dark);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 0 var(--pink-dark); }
+    .btn-primary:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--pink-dark); }
+    .btn-secondary {
+      background: var(--mint);
+      color: white;
+      box-shadow: 0 4px 0 var(--mint-dark);
+    }
+    .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 5px 0 var(--mint-dark); }
+    .btn-secondary:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--mint-dark); }
+    .btn-decide {
+      background: var(--yellow);
+      color: var(--deep);
+      box-shadow: 0 4px 0 var(--yellow-dark);
+    }
+    .btn-decide:hover { transform: translateY(-1px); box-shadow: 0 5px 0 var(--yellow-dark); }
+    .btn-decide:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--yellow-dark); }
+    .btn-undecide {
+      background: #f0f0f0;
+      color: var(--deep);
+      box-shadow: 0 4px 0 #c8c8c8;
+    }
+    .btn-undecide:hover { transform: translateY(-1px); box-shadow: 0 5px 0 #c8c8c8; }
+    .btn-line {
+      background: #06C755;
+      color: white;
+      box-shadow: 0 4px 0 #04a043;
+    }
+    .btn-line:hover { transform: translateY(-1px); box-shadow: 0 5px 0 #04a043; }
+    .btn-danger {
+      background: var(--rose);
+      color: white;
+      box-shadow: 0 4px 0 var(--rose-dark);
+    }
+    .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 5px 0 var(--rose-dark); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 2px dashed var(--border-strong);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--mint); }
+    .btn-full { width: 100%; }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: var(--cream);
+      cursor: pointer;
+      font-size: 0.95em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      color: var(--deep);
+    }
+    .icon-btn:hover { background: var(--mint); color: white; transform: scale(1.06); }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(45, 48, 71, 0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9000;
+      padding: 16px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 22px;
+      padding: 22px;
+      max-width: 540px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      border: 3px solid white;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+    .modal h3 { font-size: 1.1em; margin: 0; font-weight: 900; color: var(--deep); }
+    .modal-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.3em;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      border-radius: 50%;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--cream); color: var(--text); }
+
+    .modal-section { margin-bottom: 16px; }
+    .modal-section-label {
+      font-weight: 900;
+      font-size: 0.88em;
+      margin-bottom: 8px;
+      color: var(--deep);
+    }
+
+    /* Vote buttons */
+    .vote-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .vote-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 3px solid #e0e0e0;
+      background: white;
+      cursor: pointer;
+      font-size: 1.5em;
+      font-weight: 900;
+      color: #aaa;
+      transition: all 0.18s;
+      font-family: inherit;
+    }
+    .vote-btn:hover { transform: scale(1.08); }
+    .vote-btn.selected.o { background: var(--green); border-color: var(--green-dark); color: white; }
+    .vote-btn.selected.tri { background: var(--orange); border-color: var(--orange-dark); color: white; }
+    .vote-btn.selected.x { background: var(--rose); border-color: var(--rose-dark); color: white; }
+
+    /* Member status pills */
+    .members-status { display: flex; flex-wrap: wrap; gap: 6px; }
+    .member-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.85em;
+      font-weight: 700;
+      background: #f3f4f6;
+      color: var(--text);
+    }
+    .member-pill .mark { font-size: 0.95em; }
+    .member-pill.o { background: var(--green-light); color: var(--green-dark); }
+    .member-pill.tri { background: var(--orange-light); color: var(--orange-dark); }
+    .member-pill.x { background: var(--rose-light); color: var(--rose-dark); }
+
+    /* Inputs */
+    input[type="text"], textarea, select {
+      width: 100%;
+      padding: 9px 14px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.94em;
+      color: var(--text);
+      background: var(--cream);
+      transition: all 0.15s;
+    }
+    input[type="text"]:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--mint);
+      background: white;
+      box-shadow: 0 0 0 3px var(--mint-light);
+    }
+    textarea { min-height: 60px; resize: vertical; }
+
+    /* Comments */
+    .comments-list { margin-top: 6px; }
+    .comment {
+      padding: 10px 12px;
+      background: var(--cream);
+      border-radius: 12px;
+      margin-bottom: 6px;
+      border-left: 4px solid var(--mint);
+      font-size: 0.9em;
+    }
+    .comment-meta {
+      font-weight: 900;
+      font-size: 0.82em;
+      margin-bottom: 2px;
+      color: var(--pink);
+    }
+
+    /* Member list (settings) */
+    .member-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--cream);
+      border-radius: 12px;
+    }
+    .member-row .member-name { flex: 1; font-weight: 700; font-size: 0.92em; }
+    .member-row .owner-mark { color: var(--orange); font-size: 0.78em; font-weight: 900; }
+    .add-member-row { display: flex; gap: 6px; }
+
+    .empty-note {
+      color: var(--text-muted);
+      text-align: center;
+      padding: 16px;
+      font-size: 0.88em;
+    }
+
+    /* Share box */
+    .share-box {
+      background: linear-gradient(135deg, var(--mint), var(--green));
+      border-radius: 16px;
+      padding: 18px;
+      color: white;
+    }
+    .share-box .share-title { font-weight: 900; margin-bottom: 4px; font-size: 1em; }
+    .share-box .share-desc { font-size: 0.85em; opacity: 0.95; margin-bottom: 10px; }
+    .share-url {
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 10px;
+      font-family: 'SF Mono', Menlo, Consolas, monospace;
+      font-size: 0.78em;
+      word-break: break-all;
+      margin-bottom: 10px;
+      max-height: 100px;
+      overflow-y: auto;
+      text-align: left;
+    }
+    .share-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+    /* Welcome */
+    .welcome-card {
+      background: white;
+      border-radius: 22px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(255, 107, 157, 0.12);
+      border: 3px solid white;
+    }
+    .welcome-card .big-emoji { font-size: 3em; text-align: center; margin-bottom: 10px; }
+    .welcome-card h2 { font-size: 1.3em; margin-bottom: 6px; text-align: center; font-weight: 900; }
+    .welcome-card > p { text-align: center; color: var(--text-muted); margin-bottom: 18px; }
+
+    /* Floating decorations */
+    .deco {
+      position: fixed;
+      font-size: 2.8em;
+      opacity: 0.12;
+      pointer-events: none;
+      animation: float 4s ease-in-out infinite;
+      user-select: none;
+      z-index: 0;
+    }
+    .deco-1 { top: 8%; right: 3%; animation-delay: 0s; }
+    .deco-2 { bottom: 14%; left: 2%; animation-delay: 1.2s; }
+    .deco-3 { top: 52%; right: 4%; animation-delay: 2.4s; font-size: 2.2em; }
+    .deco-4 { top: 28%; left: 3%; animation-delay: 1.8s; font-size: 2em; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      50% { transform: translateY(-15px) rotate(5deg); }
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+      z-index: 9999;
+      top: -20px;
+      animation: confetti-fall 3s ease-in forwards;
+      border-radius: 2px;
+    }
+    @keyframes confetti-fall {
+      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* Toast */
+    .copy-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(150px);
+      background: var(--deep);
+      color: white;
+      padding: 11px 22px;
+      border-radius: 50px;
+      font-weight: 700;
+      transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+      z-index: 10000;
+      font-size: 0.9em;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .copy-toast.show { transform: translateX(-50%) translateY(0); }
+
+    .hidden { display: none !important; }
+    .mt-2 { margin-top: 10px; }
+    .mb-2 { margin-bottom: 10px; }
+    .text-muted { color: var(--text-muted); font-size: 0.88em; }
+    .center { text-align: center; }
+
+    footer {
+      text-align: center;
+      padding: 18px 0;
+      color: var(--text-muted);
+      font-size: 0.8em;
+      opacity: 0.7;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .container { padding: 12px; }
+      .app-bar { padding: 10px 14px; }
+      .app-bar h1 { font-size: 0.98em; }
+      .card { padding: 14px; }
+      .cal-cell { padding: 3px; border-radius: 8px; }
+      .cal-cell-top { font-size: 0.72em; }
+      .cal-cell-stats { font-size: 0.56em; }
+      .stat-o, .stat-tri, .stat-x { padding: 0 4px; border-radius: 4px; }
+      .month-label { min-width: 90px; font-size: 1em; }
+      .vote-btn { width: 56px; height: 56px; font-size: 1.35em; }
+      .schedule-table { font-size: 0.85em; }
+      .schedule-table th, .schedule-table td { padding: 7px 7px; }
+      .schedule-table .date-col { min-width: 100px; }
+      .tab { padding: 7px 14px; font-size: 0.88em; }
+      .legend { font-size: 0.72em; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deco deco-1">🎲</div>
+  <div class="deco deco-2">🎮</div>
+  <div class="deco deco-3">🃏</div>
+  <div class="deco deco-4">🎯</div>
+
+  <!-- App bar -->
+  <div class="app-bar">
+    <h1>🎲 ボドゲ会の日程調整</h1>
+    <div class="app-bar-actions">
+      <button class="btn btn-primary btn-sm" onclick="openShareModal()" id="share-btn">📤 URLを共有</button>
+      <button class="icon-btn" onclick="openSettings()" title="設定">⚙️</button>
+      <button class="icon-btn" onclick="openHelp()" title="使い方">?</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- ============ WELCOME ============ -->
+    <section id="welcome-view" class="hidden">
+      <div class="welcome-card">
+        <div class="big-emoji">🎉</div>
+        <h2>ようこそ！</h2>
+        <p>最初に家族のメンバーを登録しましょう。<br>あとから追加・編集もできます。</p>
+
+        <div class="modal-section">
+          <div class="modal-section-label">📛 メンバー</div>
+          <div id="welcome-members"></div>
+          <div class="add-member-row mt-2">
+            <input type="text" id="welcome-new-member" placeholder="お名前を入力">
+            <button class="btn btn-secondary btn-sm" onclick="addWelcomeMember()">＋ 追加</button>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-label">👑 オーナー（実施日を決める人）</div>
+          <select id="welcome-owner"></select>
+        </div>
+
+        <button class="btn btn-primary btn-full" onclick="finishWelcome()">🚀 はじめる</button>
+      </div>
+    </section>
+
+    <!-- ============ MAIN VIEW ============ -->
+    <section id="main-view" class="hidden">
+      <!-- Identity bar -->
+      <div class="identity-bar">
+        <label>👤 私:</label>
+        <select id="me-selector" onchange="onMeChange()"></select>
+        <span id="owner-badge" class="badge-owner hidden">👑 オーナー</span>
+      </div>
+
+      <!-- Decided dates banner -->
+      <div id="decided-banner" class="decided-banner hidden"></div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-tab="calendar" onclick="switchTab('calendar')">📅 カレンダー</button>
+        <button class="tab" data-tab="table" onclick="switchTab('table')">📊 一覧表</button>
+      </div>
+
+      <!-- Calendar tab -->
+      <div id="tab-calendar" class="tab-pane">
+        <div class="card">
+          <div class="calendar-header">
+            <div class="month-nav">
+              <button class="nav-btn" onclick="changeMonth(-1)" title="前月">◀</button>
+              <div class="month-label" id="month-label"></div>
+              <button class="nav-btn" onclick="changeMonth(1)" title="次月">▶</button>
+            </div>
+            <button class="today-btn" onclick="goToday()">今日</button>
+          </div>
+          <div id="calendar-grid" class="calendar-grid"></div>
+          <div class="legend">
+            <span><span class="stat-o">○3</span>参加可</span>
+            <span><span class="stat-tri">△1</span>多分</span>
+            <span><span class="stat-x">×1</span>不可</span>
+            <span>👑 決定日</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table tab (調整さん風) -->
+      <div id="tab-table" class="tab-pane hidden">
+        <div class="card">
+          <p class="text-muted mb-2">日付をタップすると回答・コメントできます🙋‍♂️ 未来の日付で誰かが回答したもの＋決定日を表示。</p>
+          <div class="table-wrap">
+            <div id="schedule-table-container"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggestions -->
+      <div class="card">
+        <h2>💡 おすすめ候補日 <span id="owner-hint" class="text-muted hidden">— 「決定」で実施日に確定</span></h2>
+        <div id="suggestions-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Toast -->
+  <div class="copy-toast" id="copy-toast">📋 コピーしました！</div>
+
+  <!-- Date detail modal -->
+  <div class="modal-backdrop" id="date-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="date-modal-title">📅 日付</h3>
+        <button class="modal-close" onclick="closeModal('date-modal')">✕</button>
+      </div>
+
+      <div id="date-modal-decided-section" class="modal-section hidden">
+        <div class="decided-banner" style="margin: 0;">
+          <div class="decided-title">👑 この日は実施日に決定しています！</div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">🙋 私の回答</div>
+        <div class="vote-buttons" id="vote-buttons">
+          <button class="vote-btn o" onclick="setMyVote('o')">○</button>
+          <button class="vote-btn tri" onclick="setMyVote('tri')">△</button>
+          <button class="vote-btn x" onclick="setMyVote('x')">×</button>
+        </div>
+        <div class="center mt-2">
+          <button class="btn btn-ghost btn-sm" onclick="clearMyVote()">回答をクリア</button>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">👥 みんなの回答</div>
+        <div id="members-status" class="members-status"></div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">💬 コメント</div>
+        <div id="comments-list" class="comments-list"></div>
+        <div style="display: flex; gap: 6px; margin-top: 6px;">
+          <input type="text" id="comment-input" placeholder="ひとことコメント...">
+          <button class="btn btn-secondary btn-sm" onclick="addComment()">送信</button>
+        </div>
+      </div>
+
+      <div id="owner-actions" class="modal-section hidden">
+        <button id="decide-btn" class="btn btn-decide btn-full" onclick="toggleDecided()">👑 この日を実施日に決定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>⚙️ 設定</h3>
+        <button class="modal-close" onclick="closeModal('settings-modal')">✕</button>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">📛 メンバー</div>
+        <div id="settings-members" class="member-list"></div>
+        <div class="add-member-row">
+          <input type="text" id="new-member-input" placeholder="新しいメンバー名">
+          <button class="btn btn-secondary btn-sm" onclick="addMember()">＋ 追加</button>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">👑 オーナー（実施日を決める人）</div>
+        <select id="owner-selector" onchange="changeOwner()"></select>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">🔄 別のURLをマージ</div>
+        <p class="text-muted mb-2">家族が別々のURLで回答した場合、ここで統合できます。</p>
+        <textarea id="merge-input" placeholder="URLを貼り付け"></textarea>
+        <button class="btn btn-secondary btn-sm mt-2" onclick="doMerge()">マージする</button>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-label">⚠️ リセット</div>
+        <button class="btn btn-danger btn-sm" onclick="resetAll()">全データを初期化</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share modal -->
+  <div class="modal-backdrop" id="share-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📤 URLを共有</h3>
+        <button class="modal-close" onclick="closeModal('share-modal')">✕</button>
+      </div>
+      <div class="share-box">
+        <div class="share-title">📎 最新のURL</div>
+        <div class="share-desc">家族のグループに送ってください。前のURLは古くなります。</div>
+        <div class="share-url" id="share-url"></div>
+        <div class="share-actions">
+          <button class="btn btn-primary btn-sm" onclick="copyShareUrl()">📋 コピー</button>
+          <button class="btn btn-line btn-sm" onclick="shareToLine()">📱 LINEで送る</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help modal -->
+  <div class="modal-backdrop" id="help-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>❓ 使い方</h3>
+        <button class="modal-close" onclick="closeModal('help-modal')">✕</button>
+      </div>
+      <div style="font-size: 0.92em; line-height: 1.75;">
+        <p><strong>1. 自分を選ぶ</strong><br>上部の「私:」から自分の名前を選択（端末に記憶されます）。</p>
+        <p class="mt-2"><strong>2. カレンダーまたは一覧表で回答</strong><br>日付をタップして ○（参加可）△（多分）×（不可）を入力。</p>
+        <p class="mt-2"><strong>3. URLを家族と共有</strong><br>右上の「📤 URLを共有」から最新URLを家族のLINEに送る。</p>
+        <p class="mt-2"><strong>4. オーナーが実施日を決定</strong><br>👑 オーナーは「おすすめ候補日」や日付詳細から「決定」ボタンで実施日を確定（複数可）。</p>
+        <p class="mt-2"><strong>💡 補足</strong></p>
+        <ul style="padding-left: 22px;">
+          <li>サーバー不要・登録不要</li>
+          <li>データはURL内に圧縮保存</li>
+          <li>常に <strong>最新のURL</strong> を使ってください</li>
+          <li>別々のURLで回答した場合は「設定」でマージできます</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <footer>🎲 データはURLに保存されます</footer>
+
+  <!-- LZ-String for URL compression -->
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+  <script>
+    // ============== STATE ==============
+    let state = {
+      members: [],
+      owner: '',
+      availability: {},
+      decidedDates: [],
+      comments: []
+    };
+
+    let myName = localStorage.getItem('bgs.myName') || '';
+    let displayedMonth = new Date(); displayedMonth.setDate(1);
+    let currentDateModal = null;
+    let activeTab = 'calendar';
+
+    // ============== UTILS ==============
+    function escapeHtml(str) {
+      if (str == null) return '';
+      const div = document.createElement('div');
+      div.textContent = String(str);
+      return div.innerHTML;
+    }
+
+    function toISODate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function parseISODate(str) {
+      const [y, m, d] = str.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function formatDateShort(dateStr) {
+      const d = parseISODate(dateStr);
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      return `${d.getMonth() + 1}/${d.getDate()}(${days[d.getDay()]})`;
+    }
+
+    function formatDateLong(dateStr) {
+      const d = parseISODate(dateStr);
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 (${days[d.getDay()]})`;
+    }
+
+    function formatDateTable(dateStr) {
+      const d = parseISODate(dateStr);
+      const days = ['日', '月', '火', '水', '木', '金', '土'];
+      return `${d.getMonth() + 1}/${d.getDate()} (${days[d.getDay()]})`;
+    }
+
+    function todayISO() { return toISODate(new Date()); }
+    function isPast(dateStr) { return dateStr < todayISO(); }
+
+    function showToast(msg) {
+      const toast = document.getElementById('copy-toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    function celebrate() {
+      const colors = ['#FF6B9D', '#4ECDC4', '#FFD93D', '#06D6A0', '#FF8C42', '#EF476F'];
+      for (let i = 0; i < 50; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.animationDelay = (Math.random() * 0.5) + 's';
+        c.style.transform = `rotate(${Math.random() * 360}deg)`;
+        const sz = 8 + Math.random() * 8;
+        c.style.width = sz + 'px'; c.style.height = sz + 'px';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 3400);
+      }
+    }
+
+    // ============== URL ==============
+    function loadFromURL() {
+      const hash = window.location.hash.substring(1);
+      if (!hash) return null;
+      try {
+        const decompressed = LZString.decompressFromEncodedURIComponent(hash);
+        if (!decompressed) return null;
+        return normalizeState(JSON.parse(decompressed));
+      } catch (e) { console.error(e); return null; }
+    }
+
+    function normalizeState(data) {
+      if (!data) return null;
+      return {
+        members: Array.isArray(data.members) ? data.members : [],
+        owner: typeof data.owner === 'string' ? data.owner : '',
+        availability: (data.availability && typeof data.availability === 'object') ? data.availability : {},
+        decidedDates: Array.isArray(data.decidedDates) ? data.decidedDates : [],
+        comments: Array.isArray(data.comments) ? data.comments : []
+      };
+    }
+
+    function generateURL() {
+      const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(state));
+      const base = window.location.href.split('#')[0];
+      return base + '#' + compressed;
+    }
+
+    function updateUrlHash() {
+      const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(state));
+      history.replaceState(null, '', '#' + compressed);
+    }
+
+    function persistAndRender() {
+      updateUrlHash();
+      renderAll();
+    }
+
+    // ============== INIT ==============
+    function init() {
+      const loaded = loadFromURL();
+      if (loaded && loaded.members.length > 0) {
+        state = loaded;
+        ensureMyName();
+        showMainView();
+      } else {
+        showWelcomeView();
+      }
+
+      window.addEventListener('hashchange', () => {
+        const newData = loadFromURL();
+        if (newData && newData.members.length > 0) {
+          state = newData;
+          ensureMyName();
+          showMainView();
+        }
+      });
+
+      document.querySelectorAll('.modal-backdrop').forEach(b => {
+        b.addEventListener('click', e => { if (e.target === b) b.classList.remove('show'); });
+      });
+
+      const wn = document.getElementById('welcome-new-member');
+      if (wn) wn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addWelcomeMember(); } });
+      const mn = document.getElementById('new-member-input');
+      if (mn) mn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addMember(); } });
+      const ci = document.getElementById('comment-input');
+      if (ci) ci.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addComment(); } });
+    }
+
+    function ensureMyName() {
+      if (myName && state.members.includes(myName)) return;
+      myName = state.members[0] || '';
+      localStorage.setItem('bgs.myName', myName);
+    }
+
+    // ============== WELCOME ==============
+    let welcomeMembers = [];
+
+    function showWelcomeView() {
+      document.getElementById('welcome-view').classList.remove('hidden');
+      document.getElementById('main-view').classList.add('hidden');
+      document.getElementById('share-btn').classList.add('hidden');
+      welcomeMembers = ['郷朱', '綾乃'];
+      renderWelcomeMembers();
+    }
+
+    function renderWelcomeMembers() {
+      const list = document.getElementById('welcome-members');
+      list.className = 'member-list';
+      list.innerHTML = welcomeMembers.map((m, i) => `
+        <div class="member-row">
+          <span class="member-name">${escapeHtml(m)}</span>
+          <button class="icon-btn" onclick="removeWelcomeMember(${i})" title="削除">✕</button>
+        </div>
+      `).join('');
+
+      const ownerSelect = document.getElementById('welcome-owner');
+      ownerSelect.innerHTML = welcomeMembers.map(m => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join('');
+    }
+
+    function addWelcomeMember() {
+      const input = document.getElementById('welcome-new-member');
+      const name = input.value.trim();
+      if (!name) return;
+      if (welcomeMembers.includes(name)) { alert('同じ名前のメンバーがいます'); return; }
+      welcomeMembers.push(name);
+      input.value = '';
+      renderWelcomeMembers();
+      input.focus();
+    }
+
+    function removeWelcomeMember(i) {
+      welcomeMembers.splice(i, 1);
+      renderWelcomeMembers();
+    }
+
+    function finishWelcome() {
+      if (welcomeMembers.length === 0) { alert('メンバーを1人以上追加してください 🙏'); return; }
+      const owner = document.getElementById('welcome-owner').value;
+      state = { members: [...welcomeMembers], owner, availability: {}, decidedDates: [], comments: [] };
+      welcomeMembers.forEach(m => { state.availability[m] = {}; });
+      myName = owner;
+      localStorage.setItem('bgs.myName', myName);
+      persistAndRender();
+      showMainView();
+    }
+
+    // ============== MAIN ==============
+    function showMainView() {
+      document.getElementById('welcome-view').classList.add('hidden');
+      document.getElementById('main-view').classList.remove('hidden');
+      document.getElementById('share-btn').classList.remove('hidden');
+      renderAll();
+    }
+
+    function renderAll() {
+      renderIdentityBar();
+      renderDecidedBanner();
+      renderCalendar();
+      renderScheduleTable();
+      renderSuggestions();
+    }
+
+    function renderIdentityBar() {
+      const sel = document.getElementById('me-selector');
+      sel.innerHTML = state.members.map(m =>
+        `<option value="${escapeHtml(m)}" ${m === myName ? 'selected' : ''}>${escapeHtml(m)}${m === state.owner ? ' 👑' : ''}</option>`
+      ).join('');
+
+      const ownerBadge = document.getElementById('owner-badge');
+      const ownerHint = document.getElementById('owner-hint');
+      if (myName === state.owner) {
+        ownerBadge.classList.remove('hidden');
+        ownerHint.classList.remove('hidden');
+      } else {
+        ownerBadge.classList.add('hidden');
+        ownerHint.classList.add('hidden');
+      }
+    }
+
+    function onMeChange() {
+      myName = document.getElementById('me-selector').value;
+      localStorage.setItem('bgs.myName', myName);
+      renderAll();
+    }
+
+    // ============== TABS ==============
+    function switchTab(name) {
+      activeTab = name;
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+      document.getElementById('tab-calendar').classList.toggle('hidden', name !== 'calendar');
+      document.getElementById('tab-table').classList.toggle('hidden', name !== 'table');
+    }
+
+    // ============== DECIDED BANNER ==============
+    function renderDecidedBanner() {
+      const banner = document.getElementById('decided-banner');
+      const today = todayISO();
+      const upcoming = state.decidedDates.filter(d => d >= today).sort();
+      if (upcoming.length === 0) { banner.classList.add('hidden'); return; }
+      banner.classList.remove('hidden');
+      banner.innerHTML = `
+        <div class="decided-title">👑 決定済みの実施日 (${upcoming.length}件)</div>
+        <div class="decided-list">
+          ${upcoming.map(d => `<span class="decided-chip" onclick="openDateDetail('${d}')">${formatDateShort(d)}</span>`).join('')}
+        </div>
+      `;
+    }
+
+    // ============== CALENDAR ==============
+    function changeMonth(delta) {
+      displayedMonth.setMonth(displayedMonth.getMonth() + delta);
+      renderCalendar();
+    }
+
+    function goToday() {
+      displayedMonth = new Date(); displayedMonth.setDate(1);
+      renderCalendar();
+    }
+
+    function renderCalendar() {
+      const year = displayedMonth.getFullYear();
+      const month = displayedMonth.getMonth();
+      document.getElementById('month-label').textContent = `${year}年 ${month + 1}月`;
+
+      const firstDay = new Date(year, month, 1);
+      const startDayOfWeek = firstDay.getDay();
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+
+      const cells = [];
+      for (let i = startDayOfWeek - 1; i >= 0; i--) cells.push({ date: new Date(year, month, -i), currentMonth: false });
+      for (let i = 1; i <= daysInMonth; i++) cells.push({ date: new Date(year, month, i), currentMonth: true });
+      while (cells.length % 7 !== 0 || cells.length < 35) {
+        const last = cells[cells.length - 1].date;
+        const next = new Date(last); next.setDate(next.getDate() + 1);
+        cells.push({ date: next, currentMonth: false });
+        if (cells.length === 42) break;
+      }
+
+      const dayHeaders = ['日', '月', '火', '水', '木', '金', '土'];
+      let html = dayHeaders.map((d, i) => {
+        const cls = i === 0 ? 'day-header sun' : i === 6 ? 'day-header sat' : 'day-header';
+        return `<div class="${cls}">${d}</div>`;
+      }).join('');
+
+      cells.forEach(c => html += renderCalendarCell(c));
+      document.getElementById('calendar-grid').innerHTML = html;
+    }
+
+    function renderCalendarCell(cellInfo) {
+      const dateStr = toISODate(cellInfo.date);
+      const dayOfWeek = cellInfo.date.getDay();
+      const isToday = dateStr === todayISO();
+      const isPastDate = isPast(dateStr);
+      const isDecided = state.decidedDates.includes(dateStr);
+
+      let o = 0, tri = 0, x = 0;
+      state.members.forEach(m => {
+        const ans = state.availability[m] && state.availability[m][dateStr];
+        if (ans === 'o') o++;
+        else if (ans === 'tri') tri++;
+        else if (ans === 'x') x++;
+      });
+
+      const myVote = myName && state.availability[myName] && state.availability[myName][dateStr];
+
+      const classes = ['cal-cell'];
+      if (!cellInfo.currentMonth) classes.push('other-month');
+      if (isPastDate) classes.push('past');
+      if (isToday) classes.push('today');
+      if (isDecided) classes.push('decided');
+      if (myVote) classes.push('my-' + myVote);
+
+      const topCls = dayOfWeek === 0 ? 'cal-cell-top sun' : dayOfWeek === 6 ? 'cal-cell-top sat' : 'cal-cell-top';
+
+      return `
+        <div class="${classes.join(' ')}" onclick="openDateDetail('${dateStr}')">
+          <div class="${topCls}">
+            <span>${cellInfo.date.getDate()}</span>
+            ${isDecided ? '<span class="crown">👑</span>' : ''}
+          </div>
+          <div class="cal-cell-stats">
+            ${o > 0 ? `<span class="stat-o">○${o}</span>` : ''}
+            ${tri > 0 ? `<span class="stat-tri">△${tri}</span>` : ''}
+            ${x > 0 ? `<span class="stat-x">×${x}</span>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    // ============== SCHEDULE TABLE ==============
+    function renderScheduleTable() {
+      const container = document.getElementById('schedule-table-container');
+      const today = todayISO();
+
+      const dateSet = new Set();
+      state.members.forEach(m => {
+        Object.keys(state.availability[m] || {}).forEach(d => {
+          if (d >= today) dateSet.add(d);
+        });
+      });
+      state.decidedDates.forEach(d => { if (d >= today) dateSet.add(d); });
+      const dates = Array.from(dateSet).sort();
+
+      if (dates.length === 0) {
+        container.innerHTML = '<div class="table-empty">まだ回答がありません 🙋<br>カレンダーから日付をタップして回答してみてください！</div>';
+        return;
+      }
+
+      let html = '<table class="schedule-table"><thead><tr>';
+      html += '<th class="date-col">日付</th>';
+      state.members.forEach(m => {
+        html += `<th>${escapeHtml(m)}${m === state.owner ? ' 👑' : ''}</th>`;
+      });
+      html += '<th>集計</th>';
+      html += '</tr></thead><tbody>';
+
+      dates.forEach(date => {
+        const d = parseISODate(date);
+        const dow = d.getDay();
+        const isDecided = state.decidedDates.includes(date);
+        const isPastDate = isPast(date);
+        const dowCls = dow === 0 ? 'sun' : dow === 6 ? 'sat' : '';
+
+        let o = 0, tri = 0, x = 0;
+
+        html += `<tr onclick="openDateDetail('${date}')">`;
+        html += `<td class="date-col ${isDecided ? 'decided' : ''} ${isPastDate ? 'past' : ''} ${dowCls}">${isDecided ? '👑 ' : ''}${formatDateTable(date)}</td>`;
+
+        state.members.forEach(m => {
+          const ans = state.availability[m] && state.availability[m][date];
+          let mark = '−', cls = 'mark-none';
+          if (ans === 'o') { mark = '○'; cls = 'mark-o'; o++; }
+          else if (ans === 'tri') { mark = '△'; cls = 'mark-tri'; tri++; }
+          else if (ans === 'x') { mark = '×'; cls = 'mark-x'; x++; }
+          html += `<td><span class="mark ${cls}">${mark}</span></td>`;
+        });
+
+        html += `<td class="summary-cell">`;
+        if (o > 0) html += `<span class="mark-o">○${o}</span>`;
+        if (tri > 0) html += `<span class="mark-tri">△${tri}</span>`;
+        if (x > 0) html += `<span class="mark-x">×${x}</span>`;
+        html += `</td></tr>`;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    // ============== SUGGESTIONS ==============
+    function renderSuggestions() {
+      const container = document.getElementById('suggestions-list');
+      const today = todayISO();
+      const endDate = new Date(); endDate.setDate(endDate.getDate() + 60);
+      const endISO = toISODate(endDate);
+
+      const dateMap = {};
+      state.members.forEach(m => {
+        Object.entries(state.availability[m] || {}).forEach(([d, v]) => {
+          if (d < today || d > endISO) return;
+          if (!dateMap[d]) dateMap[d] = { o: 0, tri: 0, x: 0 };
+          if (v === 'o') dateMap[d].o++;
+          else if (v === 'tri') dateMap[d].tri++;
+          else if (v === 'x') dateMap[d].x++;
+        });
+      });
+
+      const candidates = Object.entries(dateMap)
+        .map(([d, c]) => ({ date: d, ...c, score: c.o * 2 + c.tri - c.x * 2 }))
+        .filter(c => c.score > 0)
+        .sort((a, b) => b.score !== a.score ? b.score - a.score : a.date.localeCompare(b.date))
+        .slice(0, 8);
+
+      if (candidates.length === 0) {
+        container.innerHTML = '<div class="empty-note">まだおすすめできる日がありません🙋<br>○や△を入力してみてください！</div>';
+        return;
+      }
+
+      const isOwner = myName === state.owner;
+      container.innerHTML = candidates.map(c => {
+        const isDecided = state.decidedDates.includes(c.date);
+        return `
+          <div class="suggestion-item">
+            <div class="suggestion-info">
+              <div class="suggestion-date">${isDecided ? '👑 ' : ''}${formatDateLong(c.date)}</div>
+              <div class="suggestion-stats">
+                <span class="stat-pill o">○${c.o}</span>
+                ${c.tri > 0 ? `<span class="stat-pill tri">△${c.tri}</span>` : ''}
+                ${c.x > 0 ? `<span class="stat-pill x">×${c.x}</span>` : ''}
+              </div>
+            </div>
+            <div class="suggestion-actions">
+              <button class="btn btn-secondary btn-sm" onclick="openDateDetail('${c.date}')">詳細</button>
+              ${isOwner ? (isDecided
+                ? `<button class="btn btn-undecide btn-sm" onclick="toggleDecidedDate('${c.date}')">解除</button>`
+                : `<button class="btn btn-decide btn-sm" onclick="toggleDecidedDate('${c.date}')">👑 決定</button>`
+              ) : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ============== DATE DETAIL MODAL ==============
+    function openDateDetail(dateStr) {
+      currentDateModal = dateStr;
+      document.getElementById('date-modal-title').textContent = '📅 ' + formatDateLong(dateStr);
+
+      const decidedSection = document.getElementById('date-modal-decided-section');
+      const isDecided = state.decidedDates.includes(dateStr);
+      decidedSection.classList.toggle('hidden', !isDecided);
+
+      const myVote = state.availability[myName] && state.availability[myName][dateStr];
+      document.querySelectorAll('#vote-buttons .vote-btn').forEach(btn => btn.classList.remove('selected'));
+      if (myVote) {
+        const sel = document.querySelector(`#vote-buttons .vote-btn.${myVote}`);
+        if (sel) sel.classList.add('selected');
+      }
+
+      renderMembersStatus(dateStr);
+      renderCommentsForDate(dateStr);
+
+      const ownerActions = document.getElementById('owner-actions');
+      if (myName === state.owner) {
+        ownerActions.classList.remove('hidden');
+        const decideBtn = document.getElementById('decide-btn');
+        if (isDecided) {
+          decideBtn.textContent = '実施日決定を解除';
+          decideBtn.className = 'btn btn-undecide btn-full';
+        } else {
+          decideBtn.textContent = '👑 この日を実施日に決定';
+          decideBtn.className = 'btn btn-decide btn-full';
+        }
+      } else {
+        ownerActions.classList.add('hidden');
+      }
+
+      document.getElementById('date-modal').classList.add('show');
+    }
+
+    function renderMembersStatus(dateStr) {
+      const container = document.getElementById('members-status');
+      container.innerHTML = state.members.map(m => {
+        const ans = state.availability[m] && state.availability[m][dateStr];
+        let mark = '−', cls = '';
+        if (ans === 'o') { mark = '○'; cls = 'o'; }
+        else if (ans === 'tri') { mark = '△'; cls = 'tri'; }
+        else if (ans === 'x') { mark = '×'; cls = 'x'; }
+        return `<span class="member-pill ${cls}"><span class="mark">${mark}</span> ${escapeHtml(m)}</span>`;
+      }).join('');
+    }
+
+    function renderCommentsForDate(dateStr) {
+      const container = document.getElementById('comments-list');
+      const comments = state.comments.filter(c => c.date === dateStr).sort((a, b) => (a.ts || 0) - (b.ts || 0));
+      if (comments.length === 0) {
+        container.innerHTML = '<div class="empty-note">コメントはまだありません 💭</div>';
+        return;
+      }
+      container.innerHTML = comments.map(c => `
+        <div class="comment">
+          <div class="comment-meta">${escapeHtml(c.name)}</div>
+          <div style="white-space: pre-wrap;">${escapeHtml(c.text)}</div>
+        </div>
+      `).join('');
+    }
+
+    function setMyVote(value) {
+      if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
+      if (!state.availability[myName]) state.availability[myName] = {};
+      state.availability[myName][currentDateModal] = value;
+      document.querySelectorAll('#vote-buttons .vote-btn').forEach(btn => btn.classList.remove('selected'));
+      document.querySelector(`#vote-buttons .vote-btn.${value}`).classList.add('selected');
+      persistAndRender();
+      renderMembersStatus(currentDateModal);
+    }
+
+    function clearMyVote() {
+      if (!myName) return;
+      if (state.availability[myName]) delete state.availability[myName][currentDateModal];
+      document.querySelectorAll('#vote-buttons .vote-btn').forEach(btn => btn.classList.remove('selected'));
+      persistAndRender();
+      renderMembersStatus(currentDateModal);
+    }
+
+    function addComment() {
+      const input = document.getElementById('comment-input');
+      const text = input.value.trim();
+      if (!text) return;
+      if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
+      state.comments.push({ date: currentDateModal, name: myName, text, ts: Date.now() });
+      input.value = '';
+      persistAndRender();
+      renderCommentsForDate(currentDateModal);
+    }
+
+    function toggleDecided() {
+      toggleDecidedDate(currentDateModal);
+      openDateDetail(currentDateModal);
+    }
+
+    function toggleDecidedDate(dateStr) {
+      if (myName !== state.owner) { alert('オーナーのみ決定できます 👑'); return; }
+      const idx = state.decidedDates.indexOf(dateStr);
+      if (idx >= 0) {
+        state.decidedDates.splice(idx, 1);
+        showToast('決定を解除しました');
+      } else {
+        state.decidedDates.push(dateStr);
+        state.decidedDates.sort();
+        showToast('🎉 実施日に決定！');
+        celebrate();
+      }
+      persistAndRender();
+    }
+
+    // ============== SETTINGS ==============
+    function openSettings() {
+      renderSettingsMembers();
+      const ownerSel = document.getElementById('owner-selector');
+      ownerSel.innerHTML = state.members.map(m =>
+        `<option value="${escapeHtml(m)}" ${m === state.owner ? 'selected' : ''}>${escapeHtml(m)}</option>`
+      ).join('');
+      document.getElementById('settings-modal').classList.add('show');
+    }
+
+    function renderSettingsMembers() {
+      const container = document.getElementById('settings-members');
+      if (state.members.length === 0) {
+        container.innerHTML = '<div class="empty-note">メンバーがいません</div>';
+        return;
+      }
+      container.innerHTML = state.members.map((m, i) => `
+        <div class="member-row">
+          <span class="member-name">${escapeHtml(m)}${m === state.owner ? ' <span class="owner-mark">👑 オーナー</span>' : ''}</span>
+          <button class="icon-btn" onclick="removeMember(${i})" title="削除">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function addMember() {
+      const input = document.getElementById('new-member-input');
+      const name = input.value.trim();
+      if (!name) return;
+      if (state.members.includes(name)) { alert('同じ名前のメンバーがいます'); return; }
+      state.members.push(name);
+      if (!state.availability[name]) state.availability[name] = {};
+      input.value = '';
+      persistAndRender();
+      renderSettingsMembers();
+      const ownerSel = document.getElementById('owner-selector');
+      ownerSel.innerHTML = state.members.map(m =>
+        `<option value="${escapeHtml(m)}" ${m === state.owner ? 'selected' : ''}>${escapeHtml(m)}</option>`
+      ).join('');
+    }
+
+    function removeMember(i) {
+      const name = state.members[i];
+      if (!confirm(`「${name}」を削除します。回答データも全て消えます。よろしいですか？`)) return;
+      state.members.splice(i, 1);
+      delete state.availability[name];
+      state.comments = state.comments.filter(c => c.name !== name);
+      if (state.owner === name) state.owner = state.members[0] || '';
+      if (myName === name) {
+        myName = state.members[0] || '';
+        localStorage.setItem('bgs.myName', myName);
+      }
+      persistAndRender();
+      renderSettingsMembers();
+      const ownerSel = document.getElementById('owner-selector');
+      ownerSel.innerHTML = state.members.map(m =>
+        `<option value="${escapeHtml(m)}" ${m === state.owner ? 'selected' : ''}>${escapeHtml(m)}</option>`
+      ).join('');
+    }
+
+    function changeOwner() {
+      state.owner = document.getElementById('owner-selector').value;
+      persistAndRender();
+      renderSettingsMembers();
+    }
+
+    function resetAll() {
+      if (!confirm('全データを初期化します。本当によろしいですか？\n（現在のURLをブックマークしておけば後から戻れます）')) return;
+      state = { members: [], owner: '', availability: {}, decidedDates: [], comments: [] };
+      myName = '';
+      localStorage.removeItem('bgs.myName');
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+      document.getElementById('settings-modal').classList.remove('show');
+      showWelcomeView();
+    }
+
+    // ============== MERGE ==============
+    function doMerge() {
+      const input = document.getElementById('merge-input').value.trim();
+      if (!input) { alert('URLを入力してください'); return; }
+      let hash = input;
+      if (hash.includes('#')) hash = hash.split('#').pop();
+
+      try {
+        const decompressed = LZString.decompressFromEncodedURIComponent(hash);
+        if (!decompressed) throw new Error('Invalid URL');
+        const other = normalizeState(JSON.parse(decompressed));
+        if (!other) throw new Error('Invalid data');
+
+        other.members.forEach(m => {
+          if (!state.members.includes(m)) { state.members.push(m); state.availability[m] = {}; }
+        });
+
+        Object.entries(other.availability).forEach(([name, dates]) => {
+          if (!state.availability[name]) state.availability[name] = {};
+          Object.entries(dates).forEach(([d, v]) => { state.availability[name][d] = v; });
+        });
+
+        other.decidedDates.forEach(d => { if (!state.decidedDates.includes(d)) state.decidedDates.push(d); });
+        state.decidedDates.sort();
+
+        const seen = new Set(state.comments.map(c => `${c.ts}|${c.name}|${c.text}`));
+        other.comments.forEach(c => {
+          const key = `${c.ts}|${c.name}|${c.text}`;
+          if (!seen.has(key)) { state.comments.push(c); seen.add(key); }
+        });
+
+        document.getElementById('merge-input').value = '';
+        persistAndRender();
+        showToast('🔄 マージしました！');
+      } catch (e) {
+        alert('URLの形式が正しくないようです');
+      }
+    }
+
+    // ============== SHARE ==============
+    function openShareModal() {
+      const url = generateURL();
+      document.getElementById('share-url').textContent = url;
+      window.currentShareUrl = url;
+      document.getElementById('share-modal').classList.add('show');
+    }
+
+    function copyShareUrl() {
+      const url = window.currentShareUrl;
+      const fallback = () => {
+        const ta = document.createElement('textarea');
+        ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        showToast('📋 コピーしました！');
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(() => showToast('📋 コピーしました！')).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    function shareToLine() {
+      const text = `🎲 ボドゲ会の日程調整\n予定をポチポチ入力してね！\n\n${window.currentShareUrl}`;
+      const lineUrl = 'https://line.me/R/msg/text/?' + encodeURIComponent(text);
+      window.open(lineUrl, '_blank', 'noopener');
+    }
+
+    // ============== MISC ==============
+    function openHelp() { document.getElementById('help-modal').classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    init();
+  </script>
+</body>
+</html>
