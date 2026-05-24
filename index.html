@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎲 ボドゲ会の日程調整</title>
+  <title>ボドまめちゃんのボドゲ日程調整</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -36,7 +36,10 @@
       --text-muted: #7a7d8c;
       --border: #F0E5EC;
       --border-strong: #D6C5CE;
-      --bg-grad: linear-gradient(135deg, #FFE5EC 0%, #FFF5E1 50%, #E8F8F5 100%);
+      --bg-grad: radial-gradient(circle at 12% 8%, rgba(214, 245, 233, 0.9), transparent 28%),
+                 radial-gradient(circle at 88% 14%, rgba(255, 243, 204, 0.9), transparent 30%),
+                 radial-gradient(circle at 24px 24px, rgba(6, 214, 160, 0.08) 0 8px, transparent 9px),
+                 linear-gradient(135deg, #F3FFE9 0%, #FFF8E7 48%, #E8F8F5 100%);
       --card: #ffffff;
     }
 
@@ -52,12 +55,51 @@
 
     .container { max-width: 920px; margin: 0 auto; padding: 16px; position: relative; z-index: 1; }
 
+    .mascot-img {
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      background: var(--cream);
+      border: 3px solid white;
+      box-shadow: 0 8px 22px rgba(6, 214, 160, 0.18);
+    }
+    .mascot-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .game-icon {
+      display: inline-block;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      border-radius: 12px;
+      background-image: url("assets/boardgame-icons.png");
+      background-size: 200% 200%;
+      background-repeat: no-repeat;
+      background-color: var(--cream);
+      border: 2px solid white;
+      box-shadow: 0 5px 14px rgba(6, 214, 160, 0.14);
+      vertical-align: middle;
+    }
+    .game-icon.dice { background-position: 0 0; }
+    .game-icon.cards { background-position: 100% 0; }
+    .game-icon.pawns { background-position: 0 100%; }
+    .game-icon.box { background-position: 100% 100%; }
+    .game-icon.sm {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      box-shadow: none;
+    }
+
     /* App bar (pop風) */
     .app-bar {
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      border-bottom: 3px solid var(--pink-light);
+      border-bottom: 3px solid var(--green-light);
       padding: 12px 18px;
       display: flex;
       align-items: center;
@@ -67,12 +109,34 @@
       top: 0;
       z-index: 50;
     }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .brand-mascot {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      flex: 0 0 auto;
+    }
+    .brand-copy { min-width: 0; }
+    .brand-side-icon { margin-left: 2px; }
+    .brand-kicker {
+      display: block;
+      font-size: 0.72em;
+      font-weight: 900;
+      color: var(--green-dark);
+      line-height: 1.1;
+    }
     .app-bar h1 {
       font-size: 1.1em;
       font-weight: 900;
       color: var(--deep);
-      text-shadow: 2px 2px 0 var(--yellow);
+      text-shadow: 2px 2px 0 var(--yellow-light);
       letter-spacing: 0.02em;
+      line-height: 1.15;
     }
     .app-bar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
@@ -128,6 +192,10 @@
       font-size: 0.95em;
       margin-bottom: 8px;
       font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .decided-list { display: flex; flex-wrap: wrap; gap: 8px; }
     .decided-chip {
@@ -160,6 +228,9 @@
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
     }
     .tab:hover { border-color: var(--mint); color: var(--mint-dark); }
     .tab.active {
@@ -177,7 +248,10 @@
       padding: 18px;
       margin-bottom: 16px;
       box-shadow: 0 8px 24px rgba(255, 107, 157, 0.1);
+      position: relative;
+      overflow: hidden;
     }
+    .card > * { position: relative; z-index: 1; }
     .card h2 {
       font-size: 1.1em;
       font-weight: 900;
@@ -203,6 +277,13 @@
       margin-bottom: 14px;
       flex-wrap: wrap;
       gap: 8px;
+    }
+    .calendar-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      color: var(--deep);
     }
     .month-nav { display: flex; align-items: center; gap: 8px; }
     .month-label {
@@ -256,10 +337,9 @@
     .day-header.sat { color: #4a90d9; opacity: 0.85; }
 
     .cal-cell {
-      aspect-ratio: 1 / 1;
+      min-height: 112px;
       background: #fafafa;
       padding: 5px 4px;
-      cursor: pointer;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -291,10 +371,39 @@
       font-size: 0.78em;
       font-weight: 700;
       line-height: 1;
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 6px;
     }
+    .cal-cell-top:hover { background: rgba(255, 255, 255, 0.75); }
     .cal-cell-top.sun { color: var(--rose); }
     .cal-cell-top.sat { color: #4a90d9; }
     .crown { font-size: 0.9em; }
+
+    .cal-cell-votes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 3px;
+      margin: 4px 0;
+    }
+    .cal-vote-btn {
+      height: 24px;
+      border-radius: 7px;
+      border: 2px solid var(--border-strong);
+      background: white;
+      color: #aaa;
+      font-family: inherit;
+      font-size: 0.78em;
+      font-weight: 900;
+      line-height: 1;
+      cursor: pointer;
+      transition: all 0.12s;
+      padding: 0;
+    }
+    .cal-vote-btn:hover { transform: translateY(-1px); border-color: var(--mint); }
+    .cal-vote-btn.active.o { background: var(--green); color: white; border-color: var(--green-dark); }
+    .cal-vote-btn.active.tri { background: var(--orange); color: white; border-color: var(--orange-dark); }
+    .cal-vote-btn.active.x { background: var(--rose); color: white; border-color: var(--rose-dark); }
 
     .cal-cell-stats {
       display: flex;
@@ -322,6 +431,11 @@
       gap: 12px;
       flex-wrap: wrap;
       align-items: center;
+    }
+    .legend > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     .legend > span > span:first-child {
       padding: 2px 6px;
@@ -401,6 +515,30 @@
       color: var(--text-muted);
       font-size: 0.9em;
     }
+    .mascot-empty {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      padding: 18px 12px;
+      text-align: center;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .empty-mascot {
+      width: 92px;
+      aspect-ratio: 1;
+      border-radius: 24px;
+    }
+    .empty-icons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+    }
+    .mascot-empty strong {
+      color: var(--green-dark);
+      font-size: 1.02em;
+    }
 
     /* Inline vote buttons in table (調整さん風直接入力) */
     .schedule-table td.my-vote-cell {
@@ -434,14 +572,51 @@
 
     /* Hint banner */
     .hint {
-      background: var(--mint-light);
-      color: var(--mint-dark);
-      padding: 9px 14px;
+      background: linear-gradient(135deg, var(--green-light), var(--mint-light));
+      color: var(--green-dark);
+      padding: 10px 14px;
       border-radius: 12px;
       font-size: 0.85em;
       margin-bottom: 12px;
       font-weight: 700;
       line-height: 1.55;
+      border: 2px solid rgba(6, 214, 160, 0.16);
+    }
+    .mascot-speech {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .speech-mascot {
+      width: 58px;
+      aspect-ratio: 1;
+      border-radius: 16px;
+    }
+    .speech-bubble {
+      position: relative;
+      background: white;
+      border: 3px solid var(--green-light);
+      border-radius: 18px;
+      padding: 10px 14px;
+      color: var(--green-dark);
+      font-size: 0.88em;
+      font-weight: 900;
+      line-height: 1.55;
+      box-shadow: 0 6px 18px rgba(6, 214, 160, 0.1);
+    }
+    .speech-bubble::before {
+      content: "";
+      position: absolute;
+      left: -10px;
+      top: 24px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-left: 3px solid var(--green-light);
+      border-bottom: 3px solid var(--green-light);
+      transform: rotate(45deg);
     }
     .hint-inline {
       display: inline-flex;
@@ -471,6 +646,7 @@
       margin-bottom: 8px;
       gap: 12px;
       flex-wrap: wrap;
+      border: 2px solid rgba(6, 214, 160, 0.08);
     }
     .suggestion-item:last-child { margin-bottom: 0; }
     .suggestion-info { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 140px; }
@@ -754,30 +930,74 @@
       background: white;
       border-radius: 22px;
       padding: 28px;
-      box-shadow: 0 10px 30px rgba(255, 107, 157, 0.12);
+      box-shadow: 0 10px 30px rgba(6, 214, 160, 0.14);
       border: 3px solid white;
     }
-    .welcome-card .big-emoji { font-size: 3em; text-align: center; margin-bottom: 10px; }
-    .welcome-card h2 { font-size: 1.3em; margin-bottom: 6px; text-align: center; font-weight: 900; }
-    .welcome-card > p { text-align: center; color: var(--text-muted); margin-bottom: 18px; }
-
-    /* Floating decorations */
-    .deco {
-      position: fixed;
-      font-size: 2.8em;
-      opacity: 0.12;
-      pointer-events: none;
-      animation: float 4s ease-in-out infinite;
-      user-select: none;
-      z-index: 0;
+    .welcome-hero {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 18px;
     }
-    .deco-1 { top: 8%; right: 3%; animation-delay: 0s; }
-    .deco-2 { bottom: 14%; left: 2%; animation-delay: 1.2s; }
-    .deco-3 { top: 52%; right: 4%; animation-delay: 2.4s; font-size: 2.2em; }
-    .deco-4 { top: 28%; left: 3%; animation-delay: 1.8s; font-size: 2em; }
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(-5deg); }
-      50% { transform: translateY(-15px) rotate(5deg); }
+    .welcome-mascot {
+      width: 150px;
+      aspect-ratio: 1;
+      border-radius: 28px;
+    }
+    .welcome-card h2 { font-size: 1.45em; margin-bottom: 6px; font-weight: 900; }
+    .welcome-card p { color: var(--text-muted); }
+    .mascot-name {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      margin-bottom: 8px;
+      border-radius: 50px;
+      background: var(--green-light);
+      color: var(--green-dark);
+      font-size: 0.82em;
+      font-weight: 900;
+    }
+
+    .mascot-guide {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 14px;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(214, 245, 233, 0.96), rgba(255, 248, 231, 0.96));
+      border: 3px solid white;
+      border-radius: 20px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(6, 214, 160, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .mascot-guide::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      top: 12px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 217, 61, 0.52), transparent 66%);
+      pointer-events: none;
+    }
+    .guide-mascot {
+      width: 92px;
+      aspect-ratio: 1;
+      border-radius: 24px;
+    }
+    .guide-title {
+      font-weight: 900;
+      color: var(--deep);
+      margin-bottom: 4px;
+    }
+    .guide-text {
+      color: var(--text-muted);
+      font-size: 0.9em;
+      font-weight: 700;
     }
 
     /* Confetti */
@@ -831,10 +1051,27 @@
     @media (max-width: 600px) {
       .container { padding: 12px; }
       .app-bar { padding: 10px 14px; }
-      .app-bar h1 { font-size: 0.98em; }
+      .app-bar h1 { font-size: 0.92em; }
+      .brand { gap: 8px; }
+      .brand-mascot { width: 48px; height: 48px; border-radius: 16px; }
+      .brand-kicker { font-size: 0.68em; }
+      .welcome-hero { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+      .welcome-mascot { width: 132px; }
+      .mascot-guide { grid-template-columns: 74px 1fr; padding: 10px 12px; }
+      .guide-mascot { width: 74px; border-radius: 18px; }
+      .guide-text { font-size: 0.84em; }
+      .mascot-speech { grid-template-columns: 46px 1fr; gap: 9px; }
+      .speech-mascot { width: 46px; border-radius: 14px; }
+      .speech-bubble { padding: 9px 12px; font-size: 0.82em; border-radius: 16px; }
+      .speech-bubble::before { top: 20px; }
+      .empty-mascot { width: 78px; border-radius: 20px; }
+      .game-icon { width: 32px; height: 32px; border-radius: 10px; }
+      .game-icon.sm { width: 24px; height: 24px; }
       .card { padding: 14px; }
-      .cal-cell { padding: 3px; border-radius: 8px; }
+      .cal-cell { min-height: 96px; padding: 3px; border-radius: 8px; }
       .cal-cell-top { font-size: 0.72em; }
+      .cal-cell-votes { grid-template-columns: 1fr; gap: 2px; margin: 3px 0; }
+      .cal-vote-btn { height: 20px; border-radius: 6px; font-size: 0.72em; border-width: 1px; }
       .cal-cell-stats { font-size: 0.56em; }
       .stat-o, .stat-tri, .stat-x { padding: 0 4px; border-radius: 4px; }
       .month-label { min-width: 90px; font-size: 1em; }
@@ -848,14 +1085,16 @@
   </style>
 </head>
 <body>
-  <div class="deco deco-1">🎲</div>
-  <div class="deco deco-2">🎮</div>
-  <div class="deco deco-3">🃏</div>
-  <div class="deco deco-4">🎯</div>
-
   <!-- App bar -->
   <div class="app-bar">
-    <h1>🎲 ボドゲ会の日程調整</h1>
+    <div class="brand">
+      <img class="mascot-img brand-mascot" src="assets/bodomame-chan-icon.png" alt="ボドまめちゃん">
+      <div class="brand-copy">
+        <span class="brand-kicker">ボドまめちゃんと決める</span>
+        <h1>ボドゲ会の日程調整</h1>
+      </div>
+      <span class="game-icon box brand-side-icon" aria-hidden="true"></span>
+    </div>
     <div class="app-bar-actions">
       <button class="btn btn-primary btn-sm" onclick="openShareModal()" id="share-btn">📤 URLを共有</button>
       <button class="icon-btn" onclick="openSettings()" title="設定">⚙️</button>
@@ -867,9 +1106,14 @@
     <!-- ============ WELCOME ============ -->
     <section id="welcome-view" class="hidden">
       <div class="welcome-card">
-        <div class="big-emoji">🎉</div>
-        <h2>ようこそ！</h2>
-        <p>最初に家族のメンバーを登録しましょう。<br>あとから追加・編集もできます。</p>
+        <div class="welcome-hero">
+          <img class="mascot-img welcome-mascot" src="assets/bodomame-chan-main.png" alt="ボドまめちゃん">
+          <div>
+            <span class="mascot-name">ボドまめちゃん</span>
+            <h2>ボドゲ会、まめに決めよう</h2>
+            <p>最初にメンバーを登録しましょう。ボドまめちゃんが、行ける日と候補日を見やすくまとめます。</p>
+          </div>
+        </div>
 
         <div class="modal-section">
           <div class="modal-section-label">📛 メンバー</div>
@@ -898,20 +1142,35 @@
         <span id="owner-badge" class="badge-owner hidden">👑 オーナー</span>
       </div>
 
+      <div class="mascot-guide">
+        <img class="mascot-img guide-mascot" src="assets/bodomame-chan-icon-guide.png" alt="ボドまめちゃん">
+        <div>
+          <div class="guide-title">ボドまめちゃんからのひとこと</div>
+          <div class="guide-text">基本は×扱い。行ける日だけ○、迷う日は△をぽちっと入れてください。</div>
+        </div>
+      </div>
+
       <!-- Decided dates banner -->
       <div id="decided-banner" class="decided-banner hidden"></div>
 
       <!-- Tabs -->
       <div class="tabs">
-        <button class="tab active" data-tab="calendar" onclick="switchTab('calendar')">📅 カレンダー</button>
-        <button class="tab" data-tab="table" onclick="switchTab('table')">📊 一覧表</button>
+        <button class="tab active" data-tab="calendar" onclick="switchTab('calendar')"><span class="game-icon dice sm" aria-hidden="true"></span>カレンダー</button>
+        <button class="tab" data-tab="table" onclick="switchTab('table')"><span class="game-icon cards sm" aria-hidden="true"></span>一覧表</button>
       </div>
 
       <!-- Calendar tab -->
       <div id="tab-calendar" class="tab-pane">
-        <div class="hint">💡 セルをタップで <span class="hint-inline o">○</span> → <span class="hint-inline tri">△</span> → <span class="hint-inline x">×</span> → 無 を切替。長押しでコメント・詳細。</div>
+        <div class="mascot-speech">
+          <img class="mascot-img speech-mascot" src="assets/bodomame-chan-icon-think.png" alt="ボドまめちゃん">
+          <div class="speech-bubble">行ける日は <span class="hint-inline o">○</span>、たぶん行ける日は <span class="hint-inline tri">△</span>。同じボタンをもう一度押すと未入力に戻ります。</div>
+        </div>
         <div class="card">
           <div class="calendar-header">
+            <div class="calendar-title">
+              <span class="game-icon dice" aria-hidden="true"></span>
+              <span>予定をぽちぽち</span>
+            </div>
             <div class="month-nav">
               <button class="nav-btn" onclick="changeMonth(-1)" title="前月">◀</button>
               <div class="month-label" id="month-label"></div>
@@ -923,15 +1182,15 @@
           <div class="legend">
             <span><span class="stat-o">○3</span>参加可</span>
             <span><span class="stat-tri">△1</span>多分</span>
-            <span><span class="stat-x">×1</span>不可</span>
-            <span>👑 決定日</span>
+            <span><span class="game-icon pawns sm" aria-hidden="true"></span>未入力は×扱い</span>
+            <span><span class="game-icon box sm" aria-hidden="true"></span>決定日</span>
           </div>
         </div>
       </div>
 
       <!-- Table tab (調整さん風) -->
       <div id="tab-table" class="tab-pane hidden">
-        <div class="hint">💡 自分の列の <span class="hint-inline o">○</span><span class="hint-inline tri">△</span><span class="hint-inline x">×</span> ボタンで直接回答。日付ラベルをタップで詳細・コメント。</div>
+        <div class="hint"><span class="game-icon cards sm" aria-hidden="true"></span> 自分の列の <span class="hint-inline o">○</span><span class="hint-inline tri">△</span> ボタンで直接回答。未入力は×扱いです。日付ラベルをタップで詳細・コメント。</div>
         <div class="card">
           <div class="table-wrap">
             <div id="schedule-table-container"></div>
@@ -941,7 +1200,7 @@
 
       <!-- Suggestions -->
       <div class="card">
-        <h2>💡 おすすめ候補日 <span id="owner-hint" class="text-muted hidden">— 「決定」で実施日に確定</span></h2>
+        <h2><span class="game-icon pawns" aria-hidden="true"></span> ボドまめちゃんのおすすめ候補日 <span id="owner-hint" class="text-muted hidden">— 「決定」で実施日に確定</span></h2>
         <div id="suggestions-list"></div>
       </div>
     </section>
@@ -960,7 +1219,10 @@
 
       <div id="date-modal-decided-section" class="modal-section hidden">
         <div class="decided-banner" style="margin: 0;">
-          <div class="decided-title">👑 この日は実施日に決定しています！</div>
+          <div class="decided-title decided-with-mascot">
+            <img class="mascot-img mascot-avatar" src="assets/bodomame-chan-icon-celebrate.png" alt="ボドまめちゃん">
+            <span>この日は実施日に決定しています！</span>
+          </div>
         </div>
       </div>
 
@@ -969,7 +1231,6 @@
         <div class="vote-buttons" id="vote-buttons">
           <button class="vote-btn o" onclick="setMyVote('o')">○</button>
           <button class="vote-btn tri" onclick="setMyVote('tri')">△</button>
-          <button class="vote-btn x" onclick="setMyVote('x')">×</button>
         </div>
         <div class="center mt-2">
           <button class="btn btn-ghost btn-sm" onclick="clearMyVote()">回答をクリア</button>
@@ -1060,7 +1321,7 @@
       </div>
       <div style="font-size: 0.92em; line-height: 1.75;">
         <p><strong>1. 自分を選ぶ</strong><br>上部の「私:」から自分の名前を選択（端末に記憶されます）。</p>
-        <p class="mt-2"><strong>2. カレンダーまたは一覧表で回答</strong><br>日付をタップして ○（参加可）△（多分）×（不可）を入力。</p>
+        <p class="mt-2"><strong>2. カレンダーまたは一覧表で回答</strong><br>行ける日は○、迷う日は△を入力。未入力は×扱いです。</p>
         <p class="mt-2"><strong>3. URLを家族と共有</strong><br>右上の「📤 URLを共有」から最新URLを家族のLINEに送る。</p>
         <p class="mt-2"><strong>4. オーナーが実施日を決定</strong><br>👑 オーナーは「おすすめ候補日」や日付詳細から「決定」ボタンで実施日を確定（複数可）。</p>
         <p class="mt-2"><strong>💡 補足</strong></p>
@@ -1074,7 +1335,7 @@
     </div>
   </div>
 
-  <footer>🎲 データはURLに保存されます</footer>
+  <footer>🌱 ボドまめちゃんがURLに予定をしまっておきます</footer>
 
   <!-- LZ-String for URL compression -->
   <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
@@ -1133,6 +1394,10 @@
 
     function todayISO() { return toISODate(new Date()); }
     function isPast(dateStr) { return dateStr < todayISO(); }
+    function effectiveAnswer(name, dateStr) {
+      const ans = state.availability[name] && state.availability[name][dateStr];
+      return ans === 'o' || ans === 'tri' ? ans : 'x';
+    }
 
     function showToast(msg) {
       const toast = document.getElementById('copy-toast');
@@ -1241,7 +1506,7 @@
       document.getElementById('welcome-view').classList.remove('hidden');
       document.getElementById('main-view').classList.add('hidden');
       document.getElementById('share-btn').classList.add('hidden');
-      welcomeMembers = ['郷朱', '綾乃'];
+      welcomeMembers = ['郷朱', '彩乃'];
       renderWelcomeMembers();
     }
 
@@ -1341,7 +1606,7 @@
       if (upcoming.length === 0) { banner.classList.add('hidden'); return; }
       banner.classList.remove('hidden');
       banner.innerHTML = `
-        <div class="decided-title">👑 決定済みの実施日 (${upcoming.length}件)</div>
+        <div class="decided-title"><span class="game-icon box sm" aria-hidden="true"></span> ボドまめちゃんが覚えている実施日 (${upcoming.length}件)</div>
         <div class="decided-list">
           ${upcoming.map(d => `<span class="decided-chip" onclick="openDateDetail('${d}')">${formatDateShort(d)}</span>`).join('')}
         </div>
@@ -1398,7 +1663,7 @@
 
       let o = 0, tri = 0, x = 0;
       state.members.forEach(m => {
-        const ans = state.availability[m] && state.availability[m][dateStr];
+        const ans = effectiveAnswer(m, dateStr);
         if (ans === 'o') o++;
         else if (ans === 'tri') tri++;
         else if (ans === 'x') x++;
@@ -1416,23 +1681,19 @@
       const topCls = dayOfWeek === 0 ? 'cal-cell-top sun' : dayOfWeek === 6 ? 'cal-cell-top sat' : 'cal-cell-top';
 
       return `
-        <div class="${classes.join(' ')}"
-             onmousedown="startCellPress('${dateStr}')"
-             onmouseup="endCellPress()"
-             onmouseleave="cancelCellPress()"
-             ontouchstart="startCellPress('${dateStr}')"
-             ontouchend="endCellPress(event)"
-             ontouchmove="cancelCellPress()"
-             ontouchcancel="cancelCellPress()"
-             oncontextmenu="event.preventDefault(); openDateDetail('${dateStr}'); return false;">
-          <div class="${topCls}">
+        <div class="${classes.join(' ')}">
+          <div class="${topCls}" onclick="openDateDetail('${dateStr}')" title="詳細・コメント">
             <span>${cellInfo.date.getDate()}</span>
             ${isDecided ? '<span class="crown">👑</span>' : ''}
+          </div>
+          <div class="cal-cell-votes">
+            <button class="cal-vote-btn o ${myVote === 'o' ? 'active' : ''}" onclick="setMyVoteInline('${dateStr}', 'o', event)" title="参加可">○</button>
+            <button class="cal-vote-btn tri ${myVote === 'tri' ? 'active' : ''}" onclick="setMyVoteInline('${dateStr}', 'tri', event)" title="多分">△</button>
           </div>
           <div class="cal-cell-stats">
             ${o > 0 ? `<span class="stat-o">○${o}</span>` : ''}
             ${tri > 0 ? `<span class="stat-tri">△${tri}</span>` : ''}
-            ${x > 0 ? `<span class="stat-x">×${x}</span>` : ''}
+            ${(o > 0 || tri > 0 || isDecided) && x > 0 ? `<span class="stat-x">×${x}</span>` : ''}
           </div>
         </div>
       `;
@@ -1445,15 +1706,22 @@
 
       const dateSet = new Set();
       state.members.forEach(m => {
-        Object.keys(state.availability[m] || {}).forEach(d => {
-          if (d >= today) dateSet.add(d);
+        Object.entries(state.availability[m] || {}).forEach(([d, v]) => {
+          if (d >= today && (v === 'o' || v === 'tri')) dateSet.add(d);
         });
       });
       state.decidedDates.forEach(d => { if (d >= today) dateSet.add(d); });
       const dates = Array.from(dateSet).sort();
 
       if (dates.length === 0) {
-        container.innerHTML = '<div class="table-empty">まだ回答がありません 🙋<br>カレンダーから日付をタップして回答してみてください！</div>';
+        container.innerHTML = `
+          <div class="mascot-empty">
+            <img class="mascot-img empty-mascot" src="assets/bodomame-chan-empty.png" alt="ボドまめちゃん">
+            <strong>ボドまめちゃんが待機中です</strong>
+            <div class="empty-icons"><span class="game-icon dice" aria-hidden="true"></span><span class="game-icon cards" aria-hidden="true"></span></div>
+            <div>カレンダーから○か△を入れてみてください！</div>
+          </div>
+        `;
         return;
       }
 
@@ -1478,7 +1746,7 @@
         html += `<td class="date-col ${isDecided ? 'decided' : ''} ${isPastDate ? 'past' : ''} ${dowCls}" onclick="openDateDetail('${date}')">${isDecided ? '👑 ' : ''}${formatDateTable(date)}</td>`;
 
         state.members.forEach(m => {
-          const ans = state.availability[m] && state.availability[m][date];
+          const ans = effectiveAnswer(m, date);
           if (ans === 'o') o++;
           else if (ans === 'tri') tri++;
           else if (ans === 'x') x++;
@@ -1487,13 +1755,11 @@
             html += `<td class="my-vote-cell"><div class="vote-cell-buttons">`
               + `<button class="vote-cell-btn o ${ans === 'o' ? 'active' : ''}" onclick="setMyVoteInline('${date}', 'o', event)" title="参加可">○</button>`
               + `<button class="vote-cell-btn tri ${ans === 'tri' ? 'active' : ''}" onclick="setMyVoteInline('${date}', 'tri', event)" title="多分">△</button>`
-              + `<button class="vote-cell-btn x ${ans === 'x' ? 'active' : ''}" onclick="setMyVoteInline('${date}', 'x', event)" title="不可">×</button>`
               + `</div></td>`;
           } else {
-            let mark = '−', cls = 'mark-none';
+            let mark = '×', cls = 'mark-x';
             if (ans === 'o') { mark = '○'; cls = 'mark-o'; }
             else if (ans === 'tri') { mark = '△'; cls = 'mark-tri'; }
-            else if (ans === 'x') { mark = '×'; cls = 'mark-x'; }
             html += `<td onclick="openDateDetail('${date}')"><span class="mark ${cls}">${mark}</span></td>`;
           }
         });
@@ -1523,18 +1789,26 @@
           if (!dateMap[d]) dateMap[d] = { o: 0, tri: 0, x: 0 };
           if (v === 'o') dateMap[d].o++;
           else if (v === 'tri') dateMap[d].tri++;
-          else if (v === 'x') dateMap[d].x++;
         });
       });
 
+      Object.values(dateMap).forEach(c => { c.x = Math.max(0, state.members.length - c.o - c.tri); });
+
       const candidates = Object.entries(dateMap)
-        .map(([d, c]) => ({ date: d, ...c, score: c.o * 2 + c.tri - c.x * 2 }))
-        .filter(c => c.score > 0)
+        .map(([d, c]) => ({ date: d, ...c, score: c.o * 2 + c.tri }))
+        .filter(c => c.o > 0 || c.tri > 0)
         .sort((a, b) => b.score !== a.score ? b.score - a.score : a.date.localeCompare(b.date))
         .slice(0, 8);
 
       if (candidates.length === 0) {
-        container.innerHTML = '<div class="empty-note">まだおすすめできる日がありません🙋<br>○や△を入力してみてください！</div>';
+        container.innerHTML = `
+          <div class="mascot-empty">
+            <img class="mascot-img empty-mascot" src="assets/bodomame-chan-empty.png" alt="ボドまめちゃん">
+            <strong>おすすめはまだありません</strong>
+            <div class="empty-icons"><span class="game-icon pawns" aria-hidden="true"></span><span class="game-icon box" aria-hidden="true"></span></div>
+            <div>○や△が入ると、ボドまめちゃんが候補日を並べます。</div>
+          </div>
+        `;
         return;
       }
 
@@ -1564,21 +1838,6 @@
     }
 
     // ============== DIRECT VOTE INPUT ==============
-    function cycleMyVote(dateStr) {
-      if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
-      if (!state.availability[myName]) state.availability[myName] = {};
-      const current = state.availability[myName][dateStr];
-      const cycle = [undefined, 'o', 'tri', 'x'];
-      const idx = cycle.indexOf(current);
-      const next = cycle[(idx + 1) % cycle.length];
-      if (next === undefined) {
-        delete state.availability[myName][dateStr];
-      } else {
-        state.availability[myName][dateStr] = next;
-      }
-      persistAndRender();
-    }
-
     function setMyVoteInline(dateStr, value, e) {
       if (e) { e.stopPropagation(); e.preventDefault(); }
       if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
@@ -1591,45 +1850,6 @@
         state.availability[myName][dateStr] = value;
       }
       persistAndRender();
-    }
-
-    // Long-press support for calendar cells
-    let pressTimer = null;
-    let pressDate = null;
-    let pressTriggered = false;
-    const LONG_PRESS_MS = 500;
-
-    function startCellPress(dateStr) {
-      pressDate = dateStr;
-      pressTriggered = false;
-      if (pressTimer) clearTimeout(pressTimer);
-      pressTimer = setTimeout(() => {
-        pressTimer = null;
-        pressTriggered = true;
-        if (navigator.vibrate) { try { navigator.vibrate(20); } catch (e) {} }
-        openDateDetail(pressDate);
-      }, LONG_PRESS_MS);
-    }
-
-    function endCellPress(e) {
-      if (pressTimer) {
-        clearTimeout(pressTimer);
-        pressTimer = null;
-        if (!pressTriggered && pressDate) {
-          if (e && e.cancelable) e.preventDefault();
-          cycleMyVote(pressDate);
-        }
-      }
-      pressDate = null;
-      // pressTriggered cleared on next press
-    }
-
-    function cancelCellPress() {
-      if (pressTimer) {
-        clearTimeout(pressTimer);
-        pressTimer = null;
-      }
-      pressDate = null;
     }
 
     // ============== DATE DETAIL MODAL ==============
@@ -1672,11 +1892,10 @@
     function renderMembersStatus(dateStr) {
       const container = document.getElementById('members-status');
       container.innerHTML = state.members.map(m => {
-        const ans = state.availability[m] && state.availability[m][dateStr];
-        let mark = '−', cls = '';
+        const ans = effectiveAnswer(m, dateStr);
+        let mark = '×', cls = 'x';
         if (ans === 'o') { mark = '○'; cls = 'o'; }
         else if (ans === 'tri') { mark = '△'; cls = 'tri'; }
-        else if (ans === 'x') { mark = '×'; cls = 'x'; }
         return `<span class="member-pill ${cls}"><span class="mark">${mark}</span> ${escapeHtml(m)}</span>`;
       }).join('');
     }
@@ -1699,9 +1918,14 @@
     function setMyVote(value) {
       if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
       if (!state.availability[myName]) state.availability[myName] = {};
-      state.availability[myName][currentDateModal] = value;
+      const current = state.availability[myName][currentDateModal];
+      if (current === value) {
+        delete state.availability[myName][currentDateModal];
+      } else {
+        state.availability[myName][currentDateModal] = value;
+      }
       document.querySelectorAll('#vote-buttons .vote-btn').forEach(btn => btn.classList.remove('selected'));
-      document.querySelector(`#vote-buttons .vote-btn.${value}`).classList.add('selected');
+      if (current !== value) document.querySelector(`#vote-buttons .vote-btn.${value}`).classList.add('selected');
       persistAndRender();
       renderMembersStatus(currentDateModal);
     }
@@ -1885,7 +2109,7 @@
     }
 
     function shareToLine() {
-      const text = `🎲 ボドゲ会の日程調整\n予定をポチポチ入力してね！\n\n${window.currentShareUrl}`;
+      const text = `🌱 ボドまめちゃんのボドゲ日程調整\n行ける日に○、迷う日に△を入れてね！\n\n${window.currentShareUrl}`;
       const lineUrl = 'https://line.me/R/msg/text/?' + encodeURIComponent(text);
       window.open(lineUrl, '_blank', 'noopener');
     }
