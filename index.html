@@ -276,9 +276,13 @@
       background: linear-gradient(135deg, var(--yellow-light), var(--orange-light));
       border-color: var(--yellow);
     }
-    .cal-cell.my-o { box-shadow: inset 0 0 0 3px var(--green); }
-    .cal-cell.my-tri { box-shadow: inset 0 0 0 3px var(--orange); }
-    .cal-cell.my-x { box-shadow: inset 0 0 0 3px var(--rose); }
+    .cal-cell.my-o { box-shadow: inset 0 0 0 3px var(--green); background: var(--green-light); }
+    .cal-cell.my-tri { box-shadow: inset 0 0 0 3px var(--orange); background: var(--orange-light); }
+    .cal-cell.my-x { box-shadow: inset 0 0 0 3px var(--rose); background: var(--rose-light); }
+    .cal-cell.decided.my-o, .cal-cell.decided.my-tri, .cal-cell.decided.my-x {
+      background: linear-gradient(135deg, var(--yellow-light), var(--orange-light));
+    }
+    .cal-cell { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 
     .cal-cell-top {
       display: flex;
@@ -397,6 +401,64 @@
       color: var(--text-muted);
       font-size: 0.9em;
     }
+
+    /* Inline vote buttons in table (調整さん風直接入力) */
+    .schedule-table td.my-vote-cell {
+      padding: 5px 4px;
+      background: var(--cream);
+    }
+    .vote-cell-buttons {
+      display: inline-flex;
+      gap: 4px;
+      justify-content: center;
+    }
+    .vote-cell-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 2px solid var(--border-strong);
+      background: white;
+      font-size: 0.92em;
+      font-weight: 900;
+      cursor: pointer;
+      color: #b0b0b0;
+      transition: all 0.12s;
+      font-family: inherit;
+      padding: 0;
+      line-height: 1;
+    }
+    .vote-cell-btn:hover { transform: scale(1.12); border-color: var(--mint); }
+    .vote-cell-btn.active.o { background: var(--green); color: white; border-color: var(--green-dark); box-shadow: 0 2px 0 var(--green-dark); }
+    .vote-cell-btn.active.tri { background: var(--orange); color: white; border-color: var(--orange-dark); box-shadow: 0 2px 0 var(--orange-dark); }
+    .vote-cell-btn.active.x { background: var(--rose); color: white; border-color: var(--rose-dark); box-shadow: 0 2px 0 var(--rose-dark); }
+
+    /* Hint banner */
+    .hint {
+      background: var(--mint-light);
+      color: var(--mint-dark);
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 0.85em;
+      margin-bottom: 12px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+    .hint-inline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      font-weight: 900;
+      font-size: 0.85em;
+      color: white;
+      vertical-align: middle;
+      margin: 0 2px;
+    }
+    .hint-inline.o { background: var(--green); }
+    .hint-inline.tri { background: var(--orange); }
+    .hint-inline.x { background: var(--rose); }
 
     /* Suggestions list */
     .suggestion-item {
@@ -847,6 +909,7 @@
 
       <!-- Calendar tab -->
       <div id="tab-calendar" class="tab-pane">
+        <div class="hint">💡 セルをタップで <span class="hint-inline o">○</span> → <span class="hint-inline tri">△</span> → <span class="hint-inline x">×</span> → 無 を切替。長押しでコメント・詳細。</div>
         <div class="card">
           <div class="calendar-header">
             <div class="month-nav">
@@ -868,8 +931,8 @@
 
       <!-- Table tab (調整さん風) -->
       <div id="tab-table" class="tab-pane hidden">
+        <div class="hint">💡 自分の列の <span class="hint-inline o">○</span><span class="hint-inline tri">△</span><span class="hint-inline x">×</span> ボタンで直接回答。日付ラベルをタップで詳細・コメント。</div>
         <div class="card">
-          <p class="text-muted mb-2">日付をタップすると回答・コメントできます🙋‍♂️ 未来の日付で誰かが回答したもの＋決定日を表示。</p>
           <div class="table-wrap">
             <div id="schedule-table-container"></div>
           </div>
@@ -1353,7 +1416,15 @@
       const topCls = dayOfWeek === 0 ? 'cal-cell-top sun' : dayOfWeek === 6 ? 'cal-cell-top sat' : 'cal-cell-top';
 
       return `
-        <div class="${classes.join(' ')}" onclick="openDateDetail('${dateStr}')">
+        <div class="${classes.join(' ')}"
+             onmousedown="startCellPress('${dateStr}')"
+             onmouseup="endCellPress()"
+             onmouseleave="cancelCellPress()"
+             ontouchstart="startCellPress('${dateStr}')"
+             ontouchend="endCellPress(event)"
+             ontouchmove="cancelCellPress()"
+             ontouchcancel="cancelCellPress()"
+             oncontextmenu="event.preventDefault(); openDateDetail('${dateStr}'); return false;">
           <div class="${topCls}">
             <span>${cellInfo.date.getDate()}</span>
             ${isDecided ? '<span class="crown">👑</span>' : ''}
@@ -1403,19 +1474,31 @@
 
         let o = 0, tri = 0, x = 0;
 
-        html += `<tr onclick="openDateDetail('${date}')">`;
-        html += `<td class="date-col ${isDecided ? 'decided' : ''} ${isPastDate ? 'past' : ''} ${dowCls}">${isDecided ? '👑 ' : ''}${formatDateTable(date)}</td>`;
+        html += `<tr>`;
+        html += `<td class="date-col ${isDecided ? 'decided' : ''} ${isPastDate ? 'past' : ''} ${dowCls}" onclick="openDateDetail('${date}')">${isDecided ? '👑 ' : ''}${formatDateTable(date)}</td>`;
 
         state.members.forEach(m => {
           const ans = state.availability[m] && state.availability[m][date];
-          let mark = '−', cls = 'mark-none';
-          if (ans === 'o') { mark = '○'; cls = 'mark-o'; o++; }
-          else if (ans === 'tri') { mark = '△'; cls = 'mark-tri'; tri++; }
-          else if (ans === 'x') { mark = '×'; cls = 'mark-x'; x++; }
-          html += `<td><span class="mark ${cls}">${mark}</span></td>`;
+          if (ans === 'o') o++;
+          else if (ans === 'tri') tri++;
+          else if (ans === 'x') x++;
+
+          if (m === myName) {
+            html += `<td class="my-vote-cell"><div class="vote-cell-buttons">`
+              + `<button class="vote-cell-btn o ${ans === 'o' ? 'active' : ''}" onclick="setMyVoteInline('${date}', 'o', event)" title="参加可">○</button>`
+              + `<button class="vote-cell-btn tri ${ans === 'tri' ? 'active' : ''}" onclick="setMyVoteInline('${date}', 'tri', event)" title="多分">△</button>`
+              + `<button class="vote-cell-btn x ${ans === 'x' ? 'active' : ''}" onclick="setMyVoteInline('${date}', 'x', event)" title="不可">×</button>`
+              + `</div></td>`;
+          } else {
+            let mark = '−', cls = 'mark-none';
+            if (ans === 'o') { mark = '○'; cls = 'mark-o'; }
+            else if (ans === 'tri') { mark = '△'; cls = 'mark-tri'; }
+            else if (ans === 'x') { mark = '×'; cls = 'mark-x'; }
+            html += `<td onclick="openDateDetail('${date}')"><span class="mark ${cls}">${mark}</span></td>`;
+          }
         });
 
-        html += `<td class="summary-cell">`;
+        html += `<td class="summary-cell" onclick="openDateDetail('${date}')">`;
         if (o > 0) html += `<span class="mark-o">○${o}</span>`;
         if (tri > 0) html += `<span class="mark-tri">△${tri}</span>`;
         if (x > 0) html += `<span class="mark-x">×${x}</span>`;
@@ -1478,6 +1561,75 @@
           </div>
         `;
       }).join('');
+    }
+
+    // ============== DIRECT VOTE INPUT ==============
+    function cycleMyVote(dateStr) {
+      if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
+      if (!state.availability[myName]) state.availability[myName] = {};
+      const current = state.availability[myName][dateStr];
+      const cycle = [undefined, 'o', 'tri', 'x'];
+      const idx = cycle.indexOf(current);
+      const next = cycle[(idx + 1) % cycle.length];
+      if (next === undefined) {
+        delete state.availability[myName][dateStr];
+      } else {
+        state.availability[myName][dateStr] = next;
+      }
+      persistAndRender();
+    }
+
+    function setMyVoteInline(dateStr, value, e) {
+      if (e) { e.stopPropagation(); e.preventDefault(); }
+      if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
+      if (!state.availability[myName]) state.availability[myName] = {};
+      const current = state.availability[myName][dateStr];
+      if (current === value) {
+        // Toggle off if same
+        delete state.availability[myName][dateStr];
+      } else {
+        state.availability[myName][dateStr] = value;
+      }
+      persistAndRender();
+    }
+
+    // Long-press support for calendar cells
+    let pressTimer = null;
+    let pressDate = null;
+    let pressTriggered = false;
+    const LONG_PRESS_MS = 500;
+
+    function startCellPress(dateStr) {
+      pressDate = dateStr;
+      pressTriggered = false;
+      if (pressTimer) clearTimeout(pressTimer);
+      pressTimer = setTimeout(() => {
+        pressTimer = null;
+        pressTriggered = true;
+        if (navigator.vibrate) { try { navigator.vibrate(20); } catch (e) {} }
+        openDateDetail(pressDate);
+      }, LONG_PRESS_MS);
+    }
+
+    function endCellPress(e) {
+      if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+        if (!pressTriggered && pressDate) {
+          if (e && e.cancelable) e.preventDefault();
+          cycleMyVote(pressDate);
+        }
+      }
+      pressDate = null;
+      // pressTriggered cleared on next press
+    }
+
+    function cancelCellPress() {
+      if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+      pressDate = null;
     }
 
     // ============== DATE DETAIL MODAL ==============
