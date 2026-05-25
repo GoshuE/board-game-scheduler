@@ -56,9 +56,10 @@
       color: var(--text);
       line-height: 1.55;
       font-size: 15px;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .container { max-width: 920px; margin: 0 auto; padding: 16px; position: relative; z-index: 1; }
+    .container { max-width: 980px; margin: 0 auto; padding: 18px; position: relative; z-index: 1; }
 
     .mascot-img {
       display: block;
@@ -101,11 +102,11 @@
 
     /* App bar (pop風) */
     .app-bar {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 3px solid var(--green-light);
-      padding: 12px 18px;
+      padding: 10px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -113,6 +114,7 @@
       position: sticky;
       top: 0;
       z-index: 50;
+      box-shadow: 0 4px 18px rgba(4, 168, 127, 0.08);
     }
     .brand {
       display: flex;
@@ -145,26 +147,34 @@
     }
     .app-bar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
+    .top-panel {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.82fr) minmax(320px, 1.18fr);
+      gap: 12px;
+      align-items: stretch;
+      margin-bottom: 16px;
+    }
+
     /* Identity bar */
     .identity-bar {
-      background: var(--card);
-      border: 3px solid var(--mint-light);
-      border-radius: 50px;
-      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 3px solid white;
+      border-radius: 18px;
+      padding: 12px 14px;
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 0;
       flex-wrap: wrap;
-      box-shadow: 0 4px 18px rgba(255, 107, 157, 0.08);
+      box-shadow: 0 8px 24px rgba(6, 214, 160, 0.1);
     }
     .identity-bar label { font-weight: 700; font-size: 0.9em; color: var(--text); }
     .identity-bar select {
       flex: 1;
       min-width: 120px;
-      padding: 7px 12px;
-      border-radius: 50px;
-      border: 2px solid var(--mint-light);
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 2px solid rgba(78, 205, 196, 0.35);
       background: var(--cream);
       font-family: inherit;
       font-weight: 700;
@@ -218,15 +228,21 @@
     /* Tabs (pop pills) */
     .tabs {
       display: flex;
-      gap: 6px;
+      gap: 8px;
       margin-bottom: 14px;
       flex-wrap: wrap;
+      padding: 5px;
+      width: fit-content;
+      background: rgba(255, 255, 255, 0.82);
+      border: 2px solid white;
+      border-radius: 18px;
+      box-shadow: 0 7px 20px rgba(45, 48, 71, 0.06);
     }
     .tab {
-      padding: 8px 18px;
-      background: white;
-      border: 2px solid var(--border);
-      border-radius: 50px;
+      padding: 8px 16px;
+      background: transparent;
+      border: 2px solid transparent;
+      border-radius: 13px;
       font-family: inherit;
       font-size: 0.92em;
       font-weight: 700;
@@ -242,17 +258,17 @@
       background: var(--pink);
       border-color: var(--pink-dark);
       color: white;
-      box-shadow: 0 4px 0 var(--pink-dark);
+      box-shadow: 0 3px 0 var(--pink-dark);
     }
 
     /* Card */
     .card {
       background: var(--card);
       border: 3px solid white;
-      border-radius: 20px;
+      border-radius: 18px;
       padding: 18px;
       margin-bottom: 16px;
-      box-shadow: 0 8px 24px rgba(255, 107, 157, 0.1);
+      box-shadow: 0 10px 28px rgba(45, 48, 71, 0.08);
       position: relative;
       overflow: hidden;
     }
@@ -279,7 +295,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin: -4px 0 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
       flex-wrap: wrap;
       gap: 8px;
     }
@@ -328,7 +346,7 @@
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
+      gap: 5px;
     }
     .day-header {
       text-align: center;
@@ -343,17 +361,17 @@
 
     .cal-cell {
       min-height: 112px;
-      background: #fafafa;
+      background: #fbfbfb;
       padding: 5px 4px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
       transition: all 0.12s;
-      border: 2px solid transparent;
-      border-radius: 10px;
+      border: 2px solid #f4eef2;
+      border-radius: 12px;
     }
-    .cal-cell:hover { transform: translateY(-2px); box-shadow: 0 5px 12px rgba(0,0,0,0.08); }
+    .cal-cell:hover { transform: translateY(-1px); box-shadow: 0 5px 12px rgba(6, 214, 160, 0.11); }
     .cal-cell.other-month { opacity: 0.4; }
     .cal-cell.past:not(.decided) { opacity: 0.6; }
     .cal-cell.today { border-color: var(--mint); background: var(--mint-light); }
@@ -392,9 +410,9 @@
       margin: 4px 0;
     }
     .cal-vote-btn {
-      height: 24px;
+      height: 26px;
       border-radius: 7px;
-      border: 2px solid var(--border-strong);
+      border: 2px solid #eadce4;
       background: white;
       color: #aaa;
       font-family: inherit;
@@ -405,9 +423,9 @@
       transition: all 0.12s;
       padding: 0;
     }
-    .cal-vote-btn:hover { transform: translateY(-1px); border-color: var(--mint); }
-    .cal-vote-btn.active.o { background: var(--green); color: white; border-color: var(--green-dark); }
-    .cal-vote-btn.active.tri { background: var(--orange); color: white; border-color: var(--orange-dark); }
+    .cal-vote-btn:hover { transform: translateY(-1px); border-color: var(--mint); color: var(--deep); }
+    .cal-vote-btn.active.o { background: var(--green); color: white; border-color: var(--green-dark); box-shadow: 0 2px 0 var(--green-dark); }
+    .cal-vote-btn.active.tri { background: var(--orange); color: white; border-color: var(--orange-dark); box-shadow: 0 2px 0 var(--orange-dark); }
     .cal-vote-btn.active.x { background: var(--rose); color: white; border-color: var(--rose-dark); }
 
     .cal-cell-stats {
@@ -587,42 +605,6 @@
       line-height: 1.55;
       border: 2px solid rgba(6, 214, 160, 0.16);
     }
-    .mascot-speech {
-      display: grid;
-      grid-template-columns: 58px 1fr;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    .speech-mascot {
-      width: 58px;
-      aspect-ratio: 1;
-      border-radius: 16px;
-    }
-    .speech-bubble {
-      position: relative;
-      background: white;
-      border: 3px solid var(--green-light);
-      border-radius: 18px;
-      padding: 10px 14px;
-      color: var(--green-dark);
-      font-size: 0.88em;
-      font-weight: 900;
-      line-height: 1.55;
-      box-shadow: 0 6px 18px rgba(6, 214, 160, 0.1);
-    }
-    .speech-bubble::before {
-      content: "";
-      position: absolute;
-      left: -10px;
-      top: 24px;
-      width: 16px;
-      height: 16px;
-      background: white;
-      border-left: 3px solid var(--green-light);
-      border-bottom: 3px solid var(--green-light);
-      transform: rotate(45deg);
-    }
     .hint-inline {
       display: inline-flex;
       align-items: center;
@@ -640,14 +622,32 @@
     .hint-inline.tri { background: var(--orange); }
     .hint-inline.x { background: var(--rose); }
 
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 2px solid rgba(78, 205, 196, 0.28);
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--text-muted);
+      font-size: 0.86em;
+      font-weight: 800;
+    }
+    .sync-status.ok { color: var(--green-dark); background: rgba(214, 245, 233, 0.9); }
+    .sync-status.syncing { color: var(--deep); background: rgba(255, 248, 231, 0.95); }
+    .sync-status.warn { color: var(--orange-dark); background: rgba(255, 248, 231, 0.96); }
+    .sync-status.error { color: var(--rose-dark); background: rgba(255, 232, 238, 0.95); border-color: rgba(239, 71, 111, 0.25); }
+
     /* Suggestions list */
     .suggestion-item {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 12px 14px;
-      background: var(--cream);
-      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255, 248, 231, 0.9), rgba(214, 245, 233, 0.45));
+      border-radius: 12px;
       margin-bottom: 8px;
       gap: 12px;
       flex-wrap: wrap;
@@ -966,14 +966,14 @@
 
     .mascot-guide {
       display: grid;
-      grid-template-columns: 92px 1fr;
+      grid-template-columns: 78px 1fr;
       gap: 14px;
       align-items: center;
-      background: linear-gradient(135deg, rgba(214, 245, 233, 0.96), rgba(255, 248, 231, 0.96));
+      background: linear-gradient(135deg, rgba(214, 245, 233, 0.9), rgba(255, 248, 231, 0.92));
       border: 3px solid white;
-      border-radius: 20px;
-      padding: 12px 16px;
-      margin-bottom: 16px;
+      border-radius: 18px;
+      padding: 10px 14px;
+      margin-bottom: 0;
       box-shadow: 0 8px 24px rgba(6, 214, 160, 0.12);
       position: relative;
       overflow: hidden;
@@ -990,9 +990,9 @@
       pointer-events: none;
     }
     .guide-mascot {
-      width: 92px;
+      width: 78px;
       aspect-ratio: 1;
-      border-radius: 24px;
+      border-radius: 20px;
     }
     .guide-title {
       font-weight: 900;
@@ -1001,7 +1001,7 @@
     }
     .guide-text {
       color: var(--text-muted);
-      font-size: 0.9em;
+      font-size: 0.88em;
       font-weight: 700;
     }
 
@@ -1055,28 +1055,31 @@
     /* Responsive */
     @media (max-width: 600px) {
       .container { padding: 12px; }
-      .app-bar { padding: 10px 14px; }
+      .app-bar { padding: 10px 12px; align-items: flex-start; }
       .app-bar h1 { font-size: 0.92em; }
       .brand { gap: 8px; }
       .brand-mascot { width: 48px; height: 48px; border-radius: 16px; }
+      .brand-side-icon { display: none; }
       .brand-kicker { font-size: 0.68em; }
+      .app-bar-actions { gap: 6px; justify-content: flex-end; }
+      .app-bar-actions .btn-sm { padding: 7px 10px; }
+      .top-panel { grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
+      .identity-bar { border-radius: 16px; padding: 10px 12px; }
       .welcome-hero { grid-template-columns: 1fr; text-align: center; justify-items: center; }
       .welcome-mascot { width: 132px; }
-      .mascot-guide { grid-template-columns: 74px 1fr; padding: 10px 12px; }
-      .guide-mascot { width: 74px; border-radius: 18px; }
+      .mascot-guide { grid-template-columns: 66px 1fr; padding: 9px 11px; }
+      .guide-mascot { width: 66px; border-radius: 17px; }
       .guide-text { font-size: 0.84em; }
-      .mascot-speech { grid-template-columns: 46px 1fr; gap: 9px; }
-      .speech-mascot { width: 46px; border-radius: 14px; }
-      .speech-bubble { padding: 9px 12px; font-size: 0.82em; border-radius: 16px; }
-      .speech-bubble::before { top: 20px; }
       .empty-mascot { width: 78px; border-radius: 20px; }
       .game-icon { width: 32px; height: 32px; border-radius: 10px; }
       .game-icon.sm { width: 24px; height: 24px; }
-      .card { padding: 14px; }
+      .tabs { width: 100%; }
+      .tab { flex: 1; justify-content: center; padding: 7px 10px; font-size: 0.88em; }
+      .card { padding: 14px; border-radius: 16px; }
       .cal-cell { min-height: 96px; padding: 3px; border-radius: 8px; }
       .cal-cell-top { font-size: 0.72em; }
       .cal-cell-votes { grid-template-columns: 1fr; gap: 2px; margin: 3px 0; }
-      .cal-vote-btn { height: 20px; border-radius: 6px; font-size: 0.72em; border-width: 1px; }
+      .cal-vote-btn { height: 20px; border-radius: 6px; font-size: 0.72em; border-width: 1px; box-shadow: none !important; }
       .cal-cell-stats { font-size: 0.56em; }
       .stat-o, .stat-tri, .stat-x { padding: 0 4px; border-radius: 4px; }
       .month-label { min-width: 90px; font-size: 1em; }
@@ -1084,7 +1087,6 @@
       .schedule-table { font-size: 0.85em; }
       .schedule-table th, .schedule-table td { padding: 7px 7px; }
       .schedule-table .date-col { min-width: 100px; }
-      .tab { padding: 7px 14px; font-size: 0.88em; }
       .legend { font-size: 0.72em; gap: 8px; }
     }
   </style>
@@ -1140,18 +1142,22 @@
 
     <!-- ============ MAIN VIEW ============ -->
     <section id="main-view" class="hidden">
-      <!-- Identity bar -->
-      <div class="identity-bar">
-        <label>👤 私:</label>
-        <select id="me-selector" onchange="onMeChange()"></select>
-        <span id="owner-badge" class="badge-owner hidden">👑 オーナー</span>
-      </div>
+      <div id="sync-status" class="sync-status hidden"></div>
 
-      <div class="mascot-guide">
-        <img class="mascot-img guide-mascot" src="assets/bodomame-chan-icon-guide.png" alt="ボドまめちゃん">
-        <div>
-          <div class="guide-title">ボドまめちゃんからのひとこと</div>
-          <div class="guide-text">基本は×扱い。行ける日だけ○、迷う日は△をぽちっと入れてください。</div>
+      <div class="top-panel">
+        <!-- Identity bar -->
+        <div class="identity-bar">
+          <label>👤 私:</label>
+          <select id="me-selector" onchange="onMeChange()"></select>
+          <span id="owner-badge" class="badge-owner hidden">👑 オーナー</span>
+        </div>
+
+        <div class="mascot-guide">
+          <img class="mascot-img guide-mascot" src="assets/bodomame-chan-icon-guide.png" alt="ボドまめちゃん">
+          <div>
+            <div class="guide-title">ボドまめちゃんの見かた</div>
+            <div class="guide-text">行ける日は <span class="hint-inline o">○</span>、迷う日は <span class="hint-inline tri">△</span>。入力が集まると、候補日をおすすめ順に並べます。</div>
+          </div>
         </div>
       </div>
 
@@ -1166,10 +1172,6 @@
 
       <!-- Calendar tab -->
       <div id="tab-calendar" class="tab-pane">
-        <div class="mascot-speech">
-          <img class="mascot-img speech-mascot" src="assets/bodomame-chan-icon-think.png" alt="ボドまめちゃん">
-          <div class="speech-bubble">行ける日は <span class="hint-inline o">○</span>、たぶん行ける日は <span class="hint-inline tri">△</span>。同じボタンをもう一度押すと未入力に戻ります。</div>
-        </div>
         <div class="card">
           <div class="calendar-header">
             <div class="calendar-title">
@@ -1273,22 +1275,12 @@
       <div class="modal-section">
         <div class="modal-section-label">📛 メンバー</div>
         <div id="settings-members" class="member-list"></div>
-        <div class="add-member-row">
-          <input type="text" id="new-member-input" placeholder="新しいメンバー名">
-          <button class="btn btn-secondary btn-sm" onclick="addMember()">＋ 追加</button>
-        </div>
+        <p class="text-muted mt-2">参加者は、郷朱・彩乃・純子・政比呂・未紗で固定です。</p>
       </div>
 
       <div class="modal-section">
-        <div class="modal-section-label">👑 オーナー（実施日を決める人）</div>
-        <select id="owner-selector" onchange="changeOwner()"></select>
-      </div>
-
-      <div class="modal-section">
-        <div class="modal-section-label">🔄 別のURLをマージ</div>
-        <p class="text-muted mb-2">家族が別々のURLで回答した場合、ここで統合できます。</p>
-        <textarea id="merge-input" placeholder="URLを貼り付け"></textarea>
-        <button class="btn btn-secondary btn-sm mt-2" onclick="doMerge()">マージする</button>
+        <div class="modal-section-label">👑 実施日を決める人</div>
+        <p class="text-muted">実施日の決定・解除は郷朱だけができます。</p>
       </div>
 
       <div class="modal-section">
@@ -1306,8 +1298,8 @@
         <button class="modal-close" onclick="closeModal('share-modal')">✕</button>
       </div>
       <div class="share-box">
-        <div class="share-title">📎 最新のURL</div>
-        <div class="share-desc">家族のグループに送ってください。前のURLは古くなります。</div>
+        <div class="share-title">📎 共有URL</div>
+        <div class="share-desc">Google Sheetsに保存するので、このURLを家族みんなで使えます。</div>
         <div class="share-url" id="share-url"></div>
         <div class="share-actions">
           <button class="btn btn-primary btn-sm" onclick="copyShareUrl()">📋 コピー</button>
@@ -1327,32 +1319,39 @@
       <div style="font-size: 0.92em; line-height: 1.75;">
         <p><strong>1. 自分を選ぶ</strong><br>上部の「私:」から自分の名前を選択（端末に記憶されます）。</p>
         <p class="mt-2"><strong>2. カレンダーまたは一覧表で回答</strong><br>行ける日は○、迷う日は△を入力。未入力は×扱いです。</p>
-        <p class="mt-2"><strong>3. URLを家族と共有</strong><br>右上の「📤 URLを共有」から最新URLを家族のLINEに送る。</p>
-        <p class="mt-2"><strong>4. オーナーが実施日を決定</strong><br>👑 オーナーは「おすすめ候補日」や日付詳細から「決定」ボタンで実施日を確定（複数可）。</p>
+        <p class="mt-2"><strong>3. URLを家族と共有</strong><br>右上の「📤 URLを共有」から、同じURLを家族のLINEに送る。</p>
+        <p class="mt-2"><strong>4. 郷朱が実施日を決定</strong><br>「おすすめ候補日」や日付詳細から「決定」ボタンで実施日を確定（複数可）。</p>
         <p class="mt-2"><strong>💡 補足</strong></p>
         <ul style="padding-left: 22px;">
-          <li>サーバー不要・登録不要</li>
-          <li>データはURL内に圧縮保存</li>
-          <li>常に <strong>最新のURL</strong> を使ってください</li>
-          <li>別々のURLで回答した場合は「設定」でマージできます</li>
+          <li>参加者は 郷朱・彩乃・純子・政比呂・未紗 で固定</li>
+          <li>回答・コメント・決定日はGoogle Sheetsに保存</li>
+          <li>URLは固定で、家族全員が同じ最新データを見られます</li>
+          <li>Google Sheets未接続の間は、この端末だけの確認モードになります</li>
         </ul>
       </div>
     </div>
   </div>
 
-  <footer>🌱 ボドまめちゃんがURLに予定をしまっておきます</footer>
+  <footer>🌱 ボドまめちゃんがGoogle Sheetsに予定をしまっておきます</footer>
 
-  <!-- LZ-String for URL compression -->
-  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
   <script>
     // ============== STATE ==============
-    let state = {
-      members: [],
-      owner: '',
-      availability: {},
-      decidedDates: [],
-      comments: []
-    };
+    const FIXED_MEMBERS = ['郷朱', '彩乃', '純子', '政比呂', '未紗'];
+    const DEFAULT_OWNER = '郷朱';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxio5P6XlqOLwhsH8wl7kRcqjpOMdrbQkhRMLAtGHuYEQt11ULVF72aIo9ErB0J7IKdUw/exec';
+    const GOOGLE_SCRIPT_KEY = '';
+
+    function createDefaultState() {
+      return {
+        members: [...FIXED_MEMBERS],
+        owner: DEFAULT_OWNER,
+        availability: Object.fromEntries(FIXED_MEMBERS.map(name => [name, {}])),
+        decidedDates: [],
+        comments: []
+      };
+    }
+
+    let state = createDefaultState();
 
     let myName = localStorage.getItem('bgs.myName') || '';
     let displayedMonth = new Date(); displayedMonth.setDate(1);
@@ -1428,79 +1427,161 @@
       }
     }
 
-    // ============== URL ==============
-    function loadFromURL() {
-      const hash = window.location.hash.substring(1);
-      if (!hash) return null;
-      try {
-        const decompressed = LZString.decompressFromEncodedURIComponent(hash);
-        if (!decompressed) return null;
-        return normalizeState(JSON.parse(decompressed));
-      } catch (e) { console.error(e); return null; }
-    }
-
     function normalizeState(data) {
       if (!data) return null;
+      const rawAvailability = (data.availability && typeof data.availability === 'object') ? data.availability : {};
+      const availability = Object.fromEntries(FIXED_MEMBERS.map(name => [
+        name,
+        (rawAvailability[name] && typeof rawAvailability[name] === 'object') ? rawAvailability[name] : {}
+      ]));
+      const owner = FIXED_MEMBERS.includes(data.owner) ? data.owner : DEFAULT_OWNER;
       return {
-        members: Array.isArray(data.members) ? data.members : [],
-        owner: typeof data.owner === 'string' ? data.owner : '',
-        availability: (data.availability && typeof data.availability === 'object') ? data.availability : {},
+        members: [...FIXED_MEMBERS],
+        owner,
+        availability,
         decidedDates: Array.isArray(data.decidedDates) ? data.decidedDates : [],
-        comments: Array.isArray(data.comments) ? data.comments : []
+        comments: Array.isArray(data.comments) ? data.comments.filter(c => FIXED_MEMBERS.includes(c.name)) : []
       };
     }
 
+    // ============== GOOGLE SHEETS SYNC ==============
+    function isSheetsConfigured() {
+      return GOOGLE_SCRIPT_URL.trim().startsWith('https://');
+    }
+
     function generateURL() {
-      const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(state));
-      const base = window.location.href.split('#')[0];
-      return base + '#' + compressed;
+      const url = new URL(window.location.href);
+      url.search = '';
+      url.hash = '';
+      return url.toString();
     }
 
-    function updateUrlHash() {
-      const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(state));
-      history.replaceState(null, '', '#' + compressed);
+    function cleanUrlHash() {
+      if (!window.location.hash) return;
+      const url = new URL(window.location.href);
+      url.hash = '';
+      history.replaceState(null, '', url.toString());
     }
 
-    function persistAndRender() {
-      updateUrlHash();
+    function setSyncStatus(type, message) {
+      const box = document.getElementById('sync-status');
+      if (!box) return;
+      box.className = `sync-status ${type || ''}`.trim();
+      box.textContent = message;
+      box.classList.toggle('hidden', !message);
+    }
+
+    function sheetRequest(action, params = {}) {
+      return new Promise((resolve, reject) => {
+        if (!isSheetsConfigured()) {
+          reject(new Error('Google Sheets is not configured'));
+          return;
+        }
+
+        const callback = `bgsCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const url = new URL(GOOGLE_SCRIPT_URL);
+        url.searchParams.set('callback', callback);
+        url.searchParams.set('action', action);
+        if (GOOGLE_SCRIPT_KEY) url.searchParams.set('key', GOOGLE_SCRIPT_KEY);
+        Object.entries(params).forEach(([key, value]) => {
+          if (value != null) url.searchParams.set(key, String(value));
+        });
+
+        const script = document.createElement('script');
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error('Google Sheets request timed out'));
+        }, 15000);
+
+        function cleanup() {
+          clearTimeout(timer);
+          delete window[callback];
+          script.remove();
+        }
+
+        window[callback] = payload => {
+          cleanup();
+          if (payload && payload.ok) resolve(payload);
+          else reject(new Error(payload && payload.error ? payload.error : 'Google Sheets request failed'));
+        };
+
+        script.onerror = () => {
+          cleanup();
+          reject(new Error('Google Sheets request failed'));
+        };
+
+        script.src = url.toString();
+        document.body.appendChild(script);
+      });
+    }
+
+    function applyRemoteState(nextState) {
+      const normalized = normalizeState(nextState);
+      if (!normalized) return;
+      state = normalized;
+      ensureMyName();
       renderAll();
+      if (currentDateModal && document.getElementById('date-modal').classList.contains('show')) {
+        openDateDetail(currentDateModal);
+      }
+    }
+
+    async function refreshFromSheets(options = {}) {
+      if (!isSheetsConfigured()) {
+        setSyncStatus('warn', 'Google Sheets未接続です。設定完了まではこの端末だけの確認モードです。');
+        return;
+      }
+      if (!options.quiet) setSyncStatus('syncing', 'Google Sheetsから最新データを読み込み中...');
+      try {
+        const res = await sheetRequest('get');
+        applyRemoteState(res.state);
+        setSyncStatus('ok', `Google Sheetsと同期中${res.updatedAt ? ' - ' + res.updatedAt : ''}`);
+      } catch (e) {
+        console.error(e);
+        setSyncStatus('error', 'Google Sheetsとの通信に失敗しました。少し待ってから再読み込みしてください。');
+      }
+    }
+
+    async function syncMutation(action, params = {}, options = {}) {
+      if (!isSheetsConfigured()) {
+        renderAll();
+        if (currentDateModal && document.getElementById('date-modal').classList.contains('show')) {
+          openDateDetail(currentDateModal);
+        }
+        setSyncStatus('warn', 'Google Sheets未接続です。今の変更はこの端末だけの確認用です。');
+        return;
+      }
+      setSyncStatus('syncing', options.message || 'Google Sheetsに保存中...');
+      try {
+        const res = await sheetRequest(action, params);
+        applyRemoteState(res.state);
+        setSyncStatus('ok', `Google Sheetsに保存しました${res.updatedAt ? ' - ' + res.updatedAt : ''}`);
+      } catch (e) {
+        console.error(e);
+        setSyncStatus('error', '保存に失敗しました。通信状態とApps ScriptのURLを確認してください。');
+      }
     }
 
     // ============== INIT ==============
     function init() {
-      const loaded = loadFromURL();
-      if (loaded && loaded.members.length > 0) {
-        state = loaded;
-        ensureMyName();
-        showMainView();
-      } else {
-        showWelcomeView();
-      }
-
-      window.addEventListener('hashchange', () => {
-        const newData = loadFromURL();
-        if (newData && newData.members.length > 0) {
-          state = newData;
-          ensureMyName();
-          showMainView();
-        }
-      });
+      state = createDefaultState();
+      cleanUrlHash();
+      ensureMyName();
+      showMainView();
+      refreshFromSheets();
+      if (isSheetsConfigured()) setInterval(() => refreshFromSheets({ quiet: true }), 30000);
 
       document.querySelectorAll('.modal-backdrop').forEach(b => {
         b.addEventListener('click', e => { if (e.target === b) b.classList.remove('show'); });
       });
 
-      const wn = document.getElementById('welcome-new-member');
-      if (wn) wn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addWelcomeMember(); } });
-      const mn = document.getElementById('new-member-input');
-      if (mn) mn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addMember(); } });
       const ci = document.getElementById('comment-input');
       if (ci) ci.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addComment(); } });
     }
 
     function ensureMyName() {
       if (myName && state.members.includes(myName)) return;
-      myName = state.members[0] || '';
+      myName = DEFAULT_OWNER;
       localStorage.setItem('bgs.myName', myName);
     }
 
@@ -1547,13 +1628,11 @@
 
     function finishWelcome() {
       if (welcomeMembers.length === 0) { alert('メンバーを1人以上追加してください 🙏'); return; }
-      const owner = document.getElementById('welcome-owner').value;
-      state = { members: [...welcomeMembers], owner, availability: {}, decidedDates: [], comments: [] };
-      welcomeMembers.forEach(m => { state.availability[m] = {}; });
-      myName = owner;
+      state = createDefaultState();
+      myName = DEFAULT_OWNER;
       localStorage.setItem('bgs.myName', myName);
-      persistAndRender();
       showMainView();
+      refreshFromSheets();
     }
 
     // ============== MAIN ==============
@@ -1843,18 +1922,19 @@
     }
 
     // ============== DIRECT VOTE INPUT ==============
-    function setMyVoteInline(dateStr, value, e) {
+    async function setMyVoteInline(dateStr, value, e) {
       if (e) { e.stopPropagation(); e.preventDefault(); }
       if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
       if (!state.availability[myName]) state.availability[myName] = {};
       const current = state.availability[myName][dateStr];
+      const nextValue = current === value ? '' : value;
       if (current === value) {
         // Toggle off if same
         delete state.availability[myName][dateStr];
       } else {
         state.availability[myName][dateStr] = value;
       }
-      persistAndRender();
+      await syncMutation('setVote', { name: myName, date: dateStr, value: nextValue });
     }
 
     // ============== DATE DETAIL MODAL ==============
@@ -1920,10 +2000,11 @@
       `).join('');
     }
 
-    function setMyVote(value) {
+    async function setMyVote(value) {
       if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
       if (!state.availability[myName]) state.availability[myName] = {};
       const current = state.availability[myName][currentDateModal];
+      const nextValue = current === value ? '' : value;
       if (current === value) {
         delete state.availability[myName][currentDateModal];
       } else {
@@ -1931,37 +2012,38 @@
       }
       document.querySelectorAll('#vote-buttons .vote-btn').forEach(btn => btn.classList.remove('selected'));
       if (current !== value) document.querySelector(`#vote-buttons .vote-btn.${value}`).classList.add('selected');
-      persistAndRender();
+      await syncMutation('setVote', { name: myName, date: currentDateModal, value: nextValue });
       renderMembersStatus(currentDateModal);
     }
 
-    function clearMyVote() {
+    async function clearMyVote() {
       if (!myName) return;
       if (state.availability[myName]) delete state.availability[myName][currentDateModal];
       document.querySelectorAll('#vote-buttons .vote-btn').forEach(btn => btn.classList.remove('selected'));
-      persistAndRender();
+      await syncMutation('setVote', { name: myName, date: currentDateModal, value: '' });
       renderMembersStatus(currentDateModal);
     }
 
-    function addComment() {
+    async function addComment() {
       const input = document.getElementById('comment-input');
       const text = input.value.trim();
       if (!text) return;
       if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
       state.comments.push({ date: currentDateModal, name: myName, text, ts: Date.now() });
       input.value = '';
-      persistAndRender();
+      await syncMutation('addComment', { name: myName, date: currentDateModal, text });
       renderCommentsForDate(currentDateModal);
     }
 
-    function toggleDecided() {
-      toggleDecidedDate(currentDateModal);
+    async function toggleDecided() {
+      await toggleDecidedDate(currentDateModal);
       openDateDetail(currentDateModal);
     }
 
-    function toggleDecidedDate(dateStr) {
+    async function toggleDecidedDate(dateStr) {
       if (myName !== state.owner) { alert('オーナーのみ決定できます 👑'); return; }
       const idx = state.decidedDates.indexOf(dateStr);
+      const nextDecided = idx < 0;
       if (idx >= 0) {
         state.decidedDates.splice(idx, 1);
         showToast('決定を解除しました');
@@ -1971,121 +2053,32 @@
         showToast('🎉 実施日に決定！');
         celebrate();
       }
-      persistAndRender();
+      await syncMutation('setDecided', { actor: myName, date: dateStr, decided: nextDecided ? '1' : '' });
     }
 
     // ============== SETTINGS ==============
     function openSettings() {
       renderSettingsMembers();
-      const ownerSel = document.getElementById('owner-selector');
-      ownerSel.innerHTML = state.members.map(m =>
-        `<option value="${escapeHtml(m)}" ${m === state.owner ? 'selected' : ''}>${escapeHtml(m)}</option>`
-      ).join('');
       document.getElementById('settings-modal').classList.add('show');
     }
 
     function renderSettingsMembers() {
       const container = document.getElementById('settings-members');
-      if (state.members.length === 0) {
-        container.innerHTML = '<div class="empty-note">メンバーがいません</div>';
-        return;
-      }
-      container.innerHTML = state.members.map((m, i) => `
+      container.innerHTML = state.members.map(m => `
         <div class="member-row">
           <span class="member-name">${escapeHtml(m)}${m === state.owner ? ' <span class="owner-mark">👑 オーナー</span>' : ''}</span>
-          <button class="icon-btn" onclick="removeMember(${i})" title="削除">✕</button>
         </div>
       `).join('');
     }
 
-    function addMember() {
-      const input = document.getElementById('new-member-input');
-      const name = input.value.trim();
-      if (!name) return;
-      if (state.members.includes(name)) { alert('同じ名前のメンバーがいます'); return; }
-      state.members.push(name);
-      if (!state.availability[name]) state.availability[name] = {};
-      input.value = '';
-      persistAndRender();
-      renderSettingsMembers();
-      const ownerSel = document.getElementById('owner-selector');
-      ownerSel.innerHTML = state.members.map(m =>
-        `<option value="${escapeHtml(m)}" ${m === state.owner ? 'selected' : ''}>${escapeHtml(m)}</option>`
-      ).join('');
-    }
-
-    function removeMember(i) {
-      const name = state.members[i];
-      if (!confirm(`「${name}」を削除します。回答データも全て消えます。よろしいですか？`)) return;
-      state.members.splice(i, 1);
-      delete state.availability[name];
-      state.comments = state.comments.filter(c => c.name !== name);
-      if (state.owner === name) state.owner = state.members[0] || '';
-      if (myName === name) {
-        myName = state.members[0] || '';
-        localStorage.setItem('bgs.myName', myName);
-      }
-      persistAndRender();
-      renderSettingsMembers();
-      const ownerSel = document.getElementById('owner-selector');
-      ownerSel.innerHTML = state.members.map(m =>
-        `<option value="${escapeHtml(m)}" ${m === state.owner ? 'selected' : ''}>${escapeHtml(m)}</option>`
-      ).join('');
-    }
-
-    function changeOwner() {
-      state.owner = document.getElementById('owner-selector').value;
-      persistAndRender();
-      renderSettingsMembers();
-    }
-
-    function resetAll() {
-      if (!confirm('全データを初期化します。本当によろしいですか？\n（現在のURLをブックマークしておけば後から戻れます）')) return;
-      state = { members: [], owner: '', availability: {}, decidedDates: [], comments: [] };
-      myName = '';
-      localStorage.removeItem('bgs.myName');
-      history.replaceState(null, '', window.location.pathname + window.location.search);
+    async function resetAll() {
+      if (!confirm('回答・コメント・決定日を初期化します。本当によろしいですか？')) return;
+      state = createDefaultState();
+      myName = DEFAULT_OWNER;
+      localStorage.setItem('bgs.myName', myName);
       document.getElementById('settings-modal').classList.remove('show');
-      showWelcomeView();
-    }
-
-    // ============== MERGE ==============
-    function doMerge() {
-      const input = document.getElementById('merge-input').value.trim();
-      if (!input) { alert('URLを入力してください'); return; }
-      let hash = input;
-      if (hash.includes('#')) hash = hash.split('#').pop();
-
-      try {
-        const decompressed = LZString.decompressFromEncodedURIComponent(hash);
-        if (!decompressed) throw new Error('Invalid URL');
-        const other = normalizeState(JSON.parse(decompressed));
-        if (!other) throw new Error('Invalid data');
-
-        other.members.forEach(m => {
-          if (!state.members.includes(m)) { state.members.push(m); state.availability[m] = {}; }
-        });
-
-        Object.entries(other.availability).forEach(([name, dates]) => {
-          if (!state.availability[name]) state.availability[name] = {};
-          Object.entries(dates).forEach(([d, v]) => { state.availability[name][d] = v; });
-        });
-
-        other.decidedDates.forEach(d => { if (!state.decidedDates.includes(d)) state.decidedDates.push(d); });
-        state.decidedDates.sort();
-
-        const seen = new Set(state.comments.map(c => `${c.ts}|${c.name}|${c.text}`));
-        other.comments.forEach(c => {
-          const key = `${c.ts}|${c.name}|${c.text}`;
-          if (!seen.has(key)) { state.comments.push(c); seen.add(key); }
-        });
-
-        document.getElementById('merge-input').value = '';
-        persistAndRender();
-        showToast('🔄 マージしました！');
-      } catch (e) {
-        alert('URLの形式が正しくないようです');
-      }
+      showMainView();
+      await syncMutation('reset', { actor: myName }, { message: 'Google Sheetsの予定表を初期化中...' });
     }
 
     // ============== SHARE ==============
