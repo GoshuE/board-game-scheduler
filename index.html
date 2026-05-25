@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ボドまめちゃんのボドゲ日程調整</title>
+  <title>ボドまめちゃんと決める えんどーけのボドゲ予定表</title>
+  <meta name="theme-color" content="#06D6A0">
+  <meta name="description" content="えんどーけのボドゲ大会の日程を、ボドまめちゃんと一緒に決める予定表アプリです。">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/bodomame-chan-icon.png">
+  <link rel="apple-touch-icon" href="assets/bodomame-chan-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -1091,7 +1096,7 @@
       <img class="mascot-img brand-mascot" src="assets/bodomame-chan-icon.png" alt="ボドまめちゃん">
       <div class="brand-copy">
         <span class="brand-kicker">ボドまめちゃんと決める</span>
-        <h1>ボドゲ会の日程調整</h1>
+        <h1>えんどーけのボドゲ予定表</h1>
       </div>
       <span class="game-icon box brand-side-icon" aria-hidden="true"></span>
     </div>
@@ -2109,7 +2114,7 @@
     }
 
     function shareToLine() {
-      const text = `🌱 ボドまめちゃんのボドゲ日程調整\n行ける日に○、迷う日に△を入れてね！\n\n${window.currentShareUrl}`;
+      const text = `🌱 ボドまめちゃんと決める えんどーけのボドゲ予定表\n行ける日に○、迷う日に△を入れてね！\n\n${window.currentShareUrl}`;
       const lineUrl = 'https://line.me/R/msg/text/?' + encodeURIComponent(text);
       window.open(lineUrl, '_blank', 'noopener');
     }
@@ -2117,6 +2122,12 @@
     // ============== MISC ==============
     function openHelp() { document.getElementById('help-modal').classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.warn('Service worker registration failed', err));
+      });
+    }
 
     init();
   </script>
