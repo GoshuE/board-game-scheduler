@@ -1357,6 +1357,8 @@
     let displayedMonth = new Date(); displayedMonth.setDate(1);
     let currentDateModal = null;
     let activeTab = 'calendar';
+    let pendingSyncCount = 0;
+    let latestMutationSeq = 0;
 
     // ============== UTILS ==============
     function escapeHtml(str) {
@@ -1526,9 +1528,20 @@
       }
     }
 
+    function renderLocalState() {
+      renderAll();
+      if (currentDateModal && document.getElementById('date-modal').classList.contains('show')) {
+        openDateDetail(currentDateModal);
+      }
+    }
+
     async function refreshFromSheets(options = {}) {
       if (!isSheetsConfigured()) {
         setSyncStatus('warn', 'Google Sheets未接続です。設定完了まではこの端末だけの確認モードです。');
+        return;
+      }
+      if (pendingSyncCount > 0) {
+        if (!options.quiet) setSyncStatus('syncing', 'Google Sheetsに保存中...');
         return;
       }
       if (!options.quiet) setSyncStatus('syncing', 'Google Sheetsから最新データを読み込み中...');
@@ -1543,22 +1556,28 @@
     }
 
     async function syncMutation(action, params = {}, options = {}) {
+      renderLocalState();
       if (!isSheetsConfigured()) {
-        renderAll();
-        if (currentDateModal && document.getElementById('date-modal').classList.contains('show')) {
-          openDateDetail(currentDateModal);
-        }
         setSyncStatus('warn', 'Google Sheets未接続です。今の変更はこの端末だけの確認用です。');
         return;
       }
+      const mutationSeq = ++latestMutationSeq;
+      pendingSyncCount++;
       setSyncStatus('syncing', options.message || 'Google Sheetsに保存中...');
       try {
         const res = await sheetRequest(action, params);
-        applyRemoteState(res.state);
-        setSyncStatus('ok', `Google Sheetsに保存しました${res.updatedAt ? ' - ' + res.updatedAt : ''}`);
+        if (mutationSeq === latestMutationSeq) {
+          applyRemoteState(res.state);
+          setSyncStatus('ok', `Google Sheetsに保存しました${res.updatedAt ? ' - ' + res.updatedAt : ''}`);
+        }
       } catch (e) {
         console.error(e);
-        setSyncStatus('error', '保存に失敗しました。通信状態とApps ScriptのURLを確認してください。');
+        if (mutationSeq === latestMutationSeq) {
+          setSyncStatus('error', '保存に失敗しました。通信状態とApps ScriptのURLを確認してください。');
+          setTimeout(() => refreshFromSheets(), 1000);
+        }
+      } finally {
+        pendingSyncCount = Math.max(0, pendingSyncCount - 1);
       }
     }
 
