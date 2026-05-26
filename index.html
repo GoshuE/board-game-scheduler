@@ -363,9 +363,9 @@
       min-height: 112px;
       background: #fbfbfb;
       padding: 5px 4px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      align-content: stretch;
       position: relative;
       transition: all 0.12s;
       border: 2px solid #f4eef2;
@@ -408,6 +408,7 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 3px;
       margin: 4px 0;
+      align-self: start;
     }
     .cal-vote-btn {
       height: 26px;
@@ -436,6 +437,9 @@
       flex-wrap: wrap;
       line-height: 1.1;
       justify-content: flex-end;
+      align-content: flex-end;
+      align-self: end;
+      min-height: 20px;
     }
     .stat-o, .stat-tri, .stat-x {
       padding: 1px 5px;
@@ -1076,11 +1080,11 @@
       .tabs { width: 100%; }
       .tab { flex: 1; justify-content: center; padding: 7px 10px; font-size: 0.88em; }
       .card { padding: 14px; border-radius: 16px; }
-      .cal-cell { min-height: 96px; padding: 3px; border-radius: 8px; }
+      .cal-cell { min-height: 96px; padding: 3px; border-radius: 8px; grid-template-rows: 18px 42px 28px; }
       .cal-cell-top { font-size: 0.72em; }
       .cal-cell-votes { grid-template-columns: 1fr; gap: 2px; margin: 3px 0; }
       .cal-vote-btn { height: 20px; border-radius: 6px; font-size: 0.72em; border-width: 1px; box-shadow: none !important; }
-      .cal-cell-stats { font-size: 0.56em; }
+      .cal-cell-stats { font-size: 0.56em; min-height: 28px; }
       .stat-o, .stat-tri, .stat-x { padding: 0 4px; border-radius: 4px; }
       .month-label { min-width: 90px; font-size: 1em; }
       .vote-btn { width: 56px; height: 56px; font-size: 1.35em; }
