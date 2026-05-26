@@ -1709,7 +1709,7 @@
       if (upcoming.length === 0) { banner.classList.add('hidden'); return; }
       banner.classList.remove('hidden');
       banner.innerHTML = `
-        <div class="decided-title"><span class="game-icon box sm" aria-hidden="true"></span> ボドまめちゃんが覚えている実施日 (${upcoming.length}件)</div>
+        <div class="decided-title"><span class="game-icon box sm" aria-hidden="true"></span> 実施予定日 (${upcoming.length}件)</div>
         <div class="decided-list">
           ${upcoming.map(d => `<span class="decided-chip" onclick="openDateDetail('${d}')">${formatDateShort(d)}</span>`).join('')}
         </div>
