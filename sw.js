@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bodomame-scheduler-v8';
+const CACHE_NAME = 'bodomame-scheduler-v9';
 const APP_SHELL = [
   './',
   './index.html',
