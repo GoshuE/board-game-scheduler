@@ -910,30 +910,6 @@
       font-size: 0.88em;
     }
 
-    /* Share box */
-    .share-box {
-      background: linear-gradient(135deg, var(--mint), var(--green));
-      border-radius: 16px;
-      padding: 18px;
-      color: white;
-    }
-    .share-box .share-title { font-weight: 900; margin-bottom: 4px; font-size: 1em; }
-    .share-box .share-desc { font-size: 0.85em; opacity: 0.95; margin-bottom: 10px; }
-    .share-url {
-      background: rgba(255, 255, 255, 0.95);
-      color: var(--text);
-      padding: 10px;
-      border-radius: 10px;
-      font-family: 'SF Mono', Menlo, Consolas, monospace;
-      font-size: 0.78em;
-      word-break: break-all;
-      margin-bottom: 10px;
-      max-height: 100px;
-      overflow-y: auto;
-      text-align: left;
-    }
-    .share-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
-
     /* Welcome */
     .welcome-card {
       background: white;
@@ -1107,7 +1083,6 @@
       <span class="game-icon box brand-side-icon" aria-hidden="true"></span>
     </div>
     <div class="app-bar-actions">
-      <button class="btn btn-primary btn-sm" onclick="openShareModal()" id="share-btn">📤 URLを共有</button>
       <button class="icon-btn" onclick="openSettings()" title="設定">⚙️</button>
       <button class="icon-btn" onclick="openHelp()" title="使い方">?</button>
     </div>
@@ -1294,25 +1269,6 @@
     </div>
   </div>
 
-  <!-- Share modal -->
-  <div class="modal-backdrop" id="share-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>📤 URLを共有</h3>
-        <button class="modal-close" onclick="closeModal('share-modal')">✕</button>
-      </div>
-      <div class="share-box">
-        <div class="share-title">📎 共有URL</div>
-        <div class="share-desc">Google Sheetsに保存するので、このURLを家族みんなで使えます。</div>
-        <div class="share-url" id="share-url"></div>
-        <div class="share-actions">
-          <button class="btn btn-primary btn-sm" onclick="copyShareUrl()">📋 コピー</button>
-          <button class="btn btn-line btn-sm" onclick="shareToLine()">📱 LINEで送る</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Help modal -->
   <div class="modal-backdrop" id="help-modal">
     <div class="modal">
@@ -1323,13 +1279,12 @@
       <div style="font-size: 0.92em; line-height: 1.75;">
         <p><strong>1. 自分を選ぶ</strong><br>上部の「私:」から自分の名前を選択（端末に記憶されます）。</p>
         <p class="mt-2"><strong>2. カレンダーまたは一覧表で回答</strong><br>行ける日は○、迷う日は△を入力。未入力は×扱いです。</p>
-        <p class="mt-2"><strong>3. URLを家族と共有</strong><br>右上の「📤 URLを共有」から、同じURLを家族のLINEに送る。</p>
-        <p class="mt-2"><strong>4. 郷朱が実施日を決定</strong><br>「おすすめ候補日」や日付詳細から「決定」ボタンで実施日を確定（複数可）。</p>
+        <p class="mt-2"><strong>3. 郷朱が実施日を決定</strong><br>「おすすめ候補日」や日付詳細から「決定」ボタンで実施日を確定（複数可）。</p>
         <p class="mt-2"><strong>💡 補足</strong></p>
         <ul style="padding-left: 22px;">
           <li>参加者は 郷朱・彩乃・純子・政比呂・未紗 で固定</li>
           <li>回答・コメント・決定日はGoogle Sheetsに保存</li>
-          <li>URLは固定で、家族全員が同じ最新データを見られます</li>
+          <li>家族全員が同じページで最新データを見られます</li>
           <li>Google Sheets未接続の間は、この端末だけの確認モードになります</li>
         </ul>
       </div>
@@ -1453,13 +1408,6 @@
     // ============== GOOGLE SHEETS SYNC ==============
     function isSheetsConfigured() {
       return GOOGLE_SCRIPT_URL.trim().startsWith('https://');
-    }
-
-    function generateURL() {
-      const url = new URL(window.location.href);
-      url.search = '';
-      url.hash = '';
-      return url.toString();
     }
 
     function cleanUrlHash() {
@@ -1614,7 +1562,6 @@
     function showWelcomeView() {
       document.getElementById('welcome-view').classList.remove('hidden');
       document.getElementById('main-view').classList.add('hidden');
-      document.getElementById('share-btn').classList.add('hidden');
       welcomeMembers = ['郷朱', '彩乃'];
       renderWelcomeMembers();
     }
@@ -1662,7 +1609,6 @@
     function showMainView() {
       document.getElementById('welcome-view').classList.add('hidden');
       document.getElementById('main-view').classList.remove('hidden');
-      document.getElementById('share-btn').classList.remove('hidden');
       renderAll();
     }
 
@@ -2102,37 +2048,6 @@
       document.getElementById('settings-modal').classList.remove('show');
       showMainView();
       await syncMutation('reset', { actor: myName }, { message: 'Google Sheetsの予定表を初期化中...' });
-    }
-
-    // ============== SHARE ==============
-    function openShareModal() {
-      const url = generateURL();
-      document.getElementById('share-url').textContent = url;
-      window.currentShareUrl = url;
-      document.getElementById('share-modal').classList.add('show');
-    }
-
-    function copyShareUrl() {
-      const url = window.currentShareUrl;
-      const fallback = () => {
-        const ta = document.createElement('textarea');
-        ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); } catch (e) {}
-        document.body.removeChild(ta);
-        showToast('📋 コピーしました！');
-      };
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(url).then(() => showToast('📋 コピーしました！')).catch(fallback);
-      } else {
-        fallback();
-      }
-    }
-
-    function shareToLine() {
-      const text = `🌱 ボドまめちゃんと決める えんどーけのボドゲ予定表\n行ける日に○、迷う日に△を入れてね！\n\n${window.currentShareUrl}`;
-      const lineUrl = 'https://line.me/R/msg/text/?' + encodeURIComponent(text);
-      window.open(lineUrl, '_blank', 'noopener');
     }
 
     // ============== MISC ==============
