@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bodomame-scheduler-v12';
+const CACHE_NAME = 'bodomame-scheduler-v13';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const APP_SHELL = [
   './assets/bodomame-chan-celebrate.png',
   './assets/bodomame-chan-empty.png',
   './assets/bodomame-chan-guide.png',
+  './assets/bodomame-chan-header.png',
   './assets/bodomame-chan-icon-celebrate.png',
   './assets/bodomame-chan-icon-guide.png',
   './assets/bodomame-chan-icon-think.png',
