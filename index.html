@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>まめまるちゃんと決める えんどーけのボドゲ予定表</title>
+  <title>ボドまめちゃんと決める えんどーけのボドゲ予定表</title>
   <meta name="theme-color" content="#06D6A0">
-  <meta name="description" content="えんどーけのボドゲ大会の日程を、まめまるちゃんと一緒に決める予定表アプリです。">
+  <meta name="description" content="えんどーけのボドゲ大会の日程を、ボドまめちゃんと一緒に決める予定表アプリです。">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/bodomame-chan-icon.png">
   <link rel="apple-touch-icon" href="assets/bodomame-chan-icon.png">
@@ -1096,9 +1096,9 @@
   <!-- App bar -->
   <div class="app-bar">
     <div class="brand">
-      <img class="mascot-img brand-mascot" src="assets/bodomame-chan-icon.png" alt="まめまるちゃん">
+      <img class="mascot-img brand-mascot" src="assets/bodomame-chan-icon.png" alt="ボドまめちゃん">
       <div class="brand-copy">
-        <span class="brand-kicker">まめまるちゃんと決める</span>
+        <span class="brand-kicker">ボドまめちゃんと決める</span>
         <h1>えんどーけのボドゲ予定表</h1>
       </div>
       <span class="game-icon box brand-side-icon" aria-hidden="true"></span>
@@ -1114,11 +1114,11 @@
     <section id="welcome-view" class="hidden">
       <div class="welcome-card">
         <div class="welcome-hero">
-          <img class="mascot-img welcome-mascot" src="assets/bodomame-chan-main.png" alt="まめまるちゃん">
+          <img class="mascot-img welcome-mascot" src="assets/bodomame-chan-main.png" alt="ボドまめちゃん">
           <div>
-            <span class="mascot-name">まめまるちゃん</span>
+            <span class="mascot-name">ボドまめちゃん</span>
             <h2>ボドゲ会、まめに決めよう</h2>
-            <p>最初にメンバーを登録しましょう。まめまるちゃんが、行ける日と候補日を見やすくまとめます。</p>
+            <p>最初にメンバーを登録しましょう。ボドまめちゃんが、行ける日と候補日を見やすくまとめます。</p>
           </div>
         </div>
 
@@ -1153,9 +1153,9 @@
         </div>
 
         <div class="mascot-guide">
-          <img class="mascot-img guide-mascot" src="assets/bodomame-chan-icon-guide.png" alt="まめまるちゃん">
+          <img class="mascot-img guide-mascot" src="assets/bodomame-chan-icon-guide.png" alt="ボドまめちゃん">
           <div>
-            <div class="guide-title">まめまるちゃんの見かた</div>
+            <div class="guide-title">ボドまめちゃんの見かた</div>
             <div class="guide-text">行ける日は <span class="hint-inline o">○</span>、迷う日は <span class="hint-inline tri">△</span>。入力が集まると、候補日をおすすめ順に並べます。</div>
           </div>
         </div>
@@ -1207,7 +1207,7 @@
 
       <!-- Suggestions -->
       <div class="card">
-        <h2><span class="game-icon pawns" aria-hidden="true"></span> まめまるちゃんのおすすめ候補日 <span id="owner-hint" class="text-muted hidden">— 「決定」で実施日に確定</span></h2>
+        <h2><span class="game-icon pawns" aria-hidden="true"></span> ボドまめちゃんのおすすめ候補日 <span id="owner-hint" class="text-muted hidden">— 「決定」で実施日に確定</span></h2>
         <div id="suggestions-list"></div>
       </div>
     </section>
@@ -1227,7 +1227,7 @@
       <div id="date-modal-decided-section" class="modal-section hidden">
         <div class="decided-banner" style="margin: 0;">
           <div class="decided-title decided-with-mascot">
-            <img class="mascot-img mascot-avatar" src="assets/bodomame-chan-icon-celebrate.png" alt="まめまるちゃん">
+            <img class="mascot-img mascot-avatar" src="assets/bodomame-chan-icon-celebrate.png" alt="ボドまめちゃん">
             <span>この日は実施日に決定しています！</span>
           </div>
         </div>
@@ -1312,7 +1312,7 @@
     </div>
   </div>
 
-  <footer>🌱 まめまるちゃんがGoogle Sheetsに予定をしまっておきます</footer>
+  <footer>🌱 ボドまめちゃんがGoogle Sheetsに予定をしまっておきます</footer>
 
   <script>
     // ============== STATE ==============
@@ -1790,8 +1790,8 @@
       if (dates.length === 0) {
         container.innerHTML = `
           <div class="mascot-empty">
-            <img class="mascot-img empty-mascot" src="assets/bodomame-chan-empty.png" alt="まめまるちゃん">
-            <strong>まめまるちゃんが待機中です</strong>
+            <img class="mascot-img empty-mascot" src="assets/bodomame-chan-empty.png" alt="ボドまめちゃん">
+            <strong>ボドまめちゃんが待機中です</strong>
             <div class="empty-icons"><span class="game-icon dice" aria-hidden="true"></span><span class="game-icon cards" aria-hidden="true"></span></div>
             <div>カレンダーから○か△を入れてみてください！</div>
           </div>
@@ -1877,10 +1877,10 @@
       if (candidates.length === 0) {
         container.innerHTML = `
           <div class="mascot-empty">
-            <img class="mascot-img empty-mascot" src="assets/bodomame-chan-empty.png" alt="まめまるちゃん">
+            <img class="mascot-img empty-mascot" src="assets/bodomame-chan-empty.png" alt="ボドまめちゃん">
             <strong>おすすめはまだありません</strong>
             <div class="empty-icons"><span class="game-icon pawns" aria-hidden="true"></span><span class="game-icon box" aria-hidden="true"></span></div>
-            <div>○や△が入ると、まめまるちゃんが候補日を並べます。</div>
+            <div>○や△が入ると、ボドまめちゃんが候補日を並べます。</div>
           </div>
         `;
         return;
