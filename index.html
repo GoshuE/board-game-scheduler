@@ -149,6 +149,41 @@
     }
     .app-bar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
+    /* 現在の操作ユーザー（スクロールしても常に見える） */
+    .whoami-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      max-width: 46vw;
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 2px solid var(--mint-dark);
+      background: var(--mint);
+      color: #fff;
+      font-family: inherit;
+      font-weight: 900;
+      font-size: 0.85em;
+      line-height: 1.1;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      touch-action: manipulation;
+      transition: transform 0.12s, background 0.12s, box-shadow 0.12s;
+    }
+    .whoami-chip:hover { transform: translateY(-1px); }
+    .whoami-chip:active { transform: translateY(1px); }
+    .whoami-chip .whoami-label { overflow: hidden; text-overflow: ellipsis; }
+    .whoami-chip.unset {
+      background: var(--yellow);
+      color: var(--deep);
+      border-color: var(--yellow-dark);
+      animation: whoami-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes whoami-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 176, 32, 0.55); }
+      50% { box-shadow: 0 0 0 7px rgba(255, 176, 32, 0); }
+    }
+
     .top-panel {
       display: grid;
       grid-template-columns: minmax(260px, 0.82fr) minmax(320px, 1.18fr);
@@ -171,6 +206,22 @@
       box-shadow: 0 8px 24px rgba(6, 214, 160, 0.1);
     }
     .identity-bar label { font-weight: 700; font-size: 0.9em; color: var(--text); }
+    .identity-bar.needs-pick {
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px var(--yellow-light), 0 8px 24px rgba(6, 214, 160, 0.1);
+    }
+    .identity-bar.flash { animation: identity-flash 1.3s ease; }
+    @keyframes identity-flash {
+      0%, 100% { box-shadow: 0 8px 24px rgba(6, 214, 160, 0.1); }
+      25%, 60% { box-shadow: 0 0 0 5px var(--yellow); }
+    }
+    .identity-hint {
+      flex-basis: 100%;
+      margin-top: 2px;
+      font-size: 0.82em;
+      font-weight: 900;
+      color: var(--orange-dark);
+    }
     .member-picker {
       flex: 1 1 280px;
       display: flex;
@@ -1062,6 +1113,7 @@
       .brand-kicker { font-size: 0.68em; }
       .app-bar-actions { gap: 6px; justify-content: flex-end; }
       .app-bar-actions .btn-sm { padding: 7px 10px; }
+      .whoami-chip { max-width: 40vw; padding: 6px 10px; font-size: 0.8em; }
       .top-panel { grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
       .identity-bar { border-radius: 16px; padding: 10px 12px; }
       .member-picker { flex-basis: 100%; }
@@ -1104,6 +1156,7 @@
       <span class="game-icon box brand-side-icon" aria-hidden="true"></span>
     </div>
     <div class="app-bar-actions">
+      <button class="whoami-chip" id="whoami-chip" onclick="scrollToPicker()" title="操作している人（タップで切り替え）"></button>
       <button class="icon-btn" onclick="openSettings()" title="設定">⚙️</button>
       <button class="icon-btn" onclick="openHelp()" title="使い方">?</button>
     </div>
@@ -1572,9 +1625,11 @@
     }
 
     function ensureMyName() {
+      // 端末に記憶された有効な選択があればそれを尊重。無ければ「未選択」のままにする
+      // （初回アクセス時に特定の誰かを勝手に選ばない ＝ 誤操作防止）
       if (myName && state.members.includes(myName)) return;
-      myName = DEFAULT_OWNER;
-      localStorage.setItem('bgs.myName', myName);
+      myName = '';
+      try { localStorage.removeItem('bgs.myName'); } catch (e) {}
     }
 
     // ============== WELCOME ==============
@@ -1620,8 +1675,8 @@
     function finishWelcome() {
       if (welcomeMembers.length === 0) { alert('メンバーを1人以上追加してください 🙏'); return; }
       state = createDefaultState();
-      myName = DEFAULT_OWNER;
-      localStorage.setItem('bgs.myName', myName);
+      myName = '';
+      try { localStorage.removeItem('bgs.myName'); } catch (e) {}
       showMainView();
       refreshFromSheets();
     }
@@ -1647,15 +1702,71 @@
         `<button type="button" class="member-picker-btn ${m === myName ? 'active' : ''}" role="radio" aria-checked="${m === myName ? 'true' : 'false'}" onclick="onMeChange('${escapeHtml(m)}')">${escapeHtml(m)}${m === state.owner ? ' 👑' : ''}</button>`
       ).join('');
 
+      // 未選択のときは identity-bar を強調し、選択を促すヒントを出す
+      const hasName = !!(myName && state.members.includes(myName));
+      const bar = picker.closest('.identity-bar');
+      if (bar) {
+        bar.classList.toggle('needs-pick', !hasName);
+        let hint = document.getElementById('identity-hint');
+        if (!hasName) {
+          if (!hint) {
+            hint = document.createElement('div');
+            hint.id = 'identity-hint';
+            hint.className = 'identity-hint';
+            hint.textContent = '👆 まずは自分をタップして選んでね';
+            bar.appendChild(hint);
+          }
+        } else if (hint) {
+          hint.remove();
+        }
+      }
+
       const ownerBadge = document.getElementById('owner-badge');
       const ownerHint = document.getElementById('owner-hint');
-      if (myName === state.owner) {
+      if (hasName && myName === state.owner) {
         ownerBadge.classList.remove('hidden');
         ownerHint.classList.remove('hidden');
       } else {
         ownerBadge.classList.add('hidden');
         ownerHint.classList.add('hidden');
       }
+
+      renderWhoami();
+    }
+
+    // ヘッダーの「現在の操作ユーザー」チップを更新（スクロール追従表示）
+    function renderWhoami() {
+      const chip = document.getElementById('whoami-chip');
+      if (!chip) return;
+      if (myName && state.members.includes(myName)) {
+        const crown = myName === state.owner ? ' 👑' : '';
+        chip.innerHTML = `<span aria-hidden="true">👤</span><span class="whoami-label">${escapeHtml(myName)}${crown}</span>`;
+        chip.classList.remove('unset');
+        chip.setAttribute('title', myName + ' として操作中（タップで切り替え）');
+        chip.setAttribute('aria-label', myName + ' として操作中。タップで切り替え');
+      } else {
+        chip.innerHTML = `<span aria-hidden="true">👤</span><span class="whoami-label">私は？タップ</span>`;
+        chip.classList.add('unset');
+        chip.setAttribute('title', '操作する人を選んでください');
+        chip.setAttribute('aria-label', '操作する人が未選択です。タップして選択');
+      }
+    }
+
+    // 選択エリアへスクロールして軽く光らせる
+    function scrollToPicker() {
+      const bar = document.querySelector('.identity-bar');
+      if (!bar) return;
+      bar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      bar.classList.remove('flash');
+      void bar.offsetWidth; // reflowでアニメを再スタート
+      bar.classList.add('flash');
+      setTimeout(() => bar.classList.remove('flash'), 1400);
+    }
+
+    // 未選択のまま操作しようとしたときに選択を促す
+    function promptPickIdentity() {
+      scrollToPicker();
+      showToast('👆 まず「私」から自分を選んでね');
     }
 
     function onMeChange(name) {
@@ -1914,7 +2025,7 @@
     // ============== DIRECT VOTE INPUT ==============
     async function setMyVoteInline(dateStr, value, e) {
       if (e) { e.stopPropagation(); e.preventDefault(); }
-      if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
+      if (!myName) { promptPickIdentity(); return; }
       if (!state.availability[myName]) state.availability[myName] = {};
       const current = state.availability[myName][dateStr];
       const nextValue = current === value ? '' : value;
@@ -1991,7 +2102,7 @@
     }
 
     async function setMyVote(value) {
-      if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
+      if (!myName) { promptPickIdentity(); return; }
       if (!state.availability[myName]) state.availability[myName] = {};
       const current = state.availability[myName][currentDateModal];
       const nextValue = current === value ? '' : value;
@@ -2018,7 +2129,7 @@
       const input = document.getElementById('comment-input');
       const text = input.value.trim();
       if (!text) return;
-      if (!myName) { alert('まず「私」から自分を選択してください 🙏'); return; }
+      if (!myName) { promptPickIdentity(); return; }
       state.comments.push({ date: currentDateModal, name: myName, text, ts: Date.now() });
       input.value = '';
       await syncMutation('addComment', { name: myName, date: currentDateModal, text });
@@ -2062,10 +2173,9 @@
     }
 
     async function resetAll() {
+      if (myName !== state.owner) { alert('初期化はオーナー（' + state.owner + '）だけができます 👑'); return; }
       if (!confirm('回答・コメント・決定日を初期化します。本当によろしいですか？')) return;
       state = createDefaultState();
-      myName = DEFAULT_OWNER;
-      localStorage.setItem('bgs.myName', myName);
       document.getElementById('settings-modal').classList.remove('show');
       showMainView();
       await syncMutation('reset', { actor: myName }, { message: 'Google Sheetsの予定表を初期化中...' });
