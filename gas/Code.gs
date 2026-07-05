@@ -328,3 +328,31 @@ function doPost(e) {
   }
   return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);
 }
+
+// ============== 自動催促（週次トリガー） ==============
+// 毎週決まった曜日・時刻に、未入力者がいればLINEで催促する。
+// トリガーは setupWeeklyNudge() を一度手動実行して作成する。
+function weeklyNudge() {
+  var now = Date.now();
+  var last = Number(scriptProp_('LAST_NUDGE_TS')) || 0;
+  if (now - last < 6 * 60 * 60 * 1000) return; // 直近6時間に送信済みなら手動催促との重複を避けてスキップ
+  var state = readState_();
+  var missing = membersWithNoUpcomingVotes_(state);
+  if (missing.length === 0) return; // 全員入力済みなら送らない
+  notifyLine_(buildNudgeMessage_(missing));
+  PropertiesService.getScriptProperties().setProperty('LAST_NUDGE_TS', String(now));
+}
+
+// 週次トリガーを作成/再作成する（毎週月曜の20時台に weeklyNudge を実行）。
+// GASエディタでこの関数を一度だけ手動実行すること。曜日・時刻を変えたいときは
+// onWeekDay / atHour を編集して再実行すれば、古いトリガーは自動で置き換わる。
+function setupWeeklyNudge() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'weeklyNudge') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('weeklyNudge')
+    .timeBased()
+    .onWeekDay(ScriptApp.WeekDay.MONDAY)
+    .atHour(20)
+    .create();
+}
