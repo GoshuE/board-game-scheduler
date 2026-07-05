@@ -1261,6 +1261,7 @@
       <!-- Suggestions -->
       <div class="card">
         <h2><span class="game-icon pawns" aria-hidden="true"></span> ボドまめちゃんのおすすめ候補日 <span id="owner-hint" class="text-muted hidden">— 「決定」で実施日に確定</span></h2>
+        <button id="nudge-btn" class="btn btn-secondary btn-sm hidden" onclick="nudgeMembers()" style="margin-bottom: 12px;">📣 未入力の家族にLINEで催促</button>
         <div id="suggestions-list"></div>
       </div>
     </section>
@@ -1596,6 +1597,7 @@
           applyRemoteState(res.state);
           setSyncStatus('ok', `Google Sheetsに保存しました${res.updatedAt ? ' - ' + res.updatedAt : ''}`);
         }
+        return res;
       } catch (e) {
         console.error(e);
         if (mutationSeq === latestMutationSeq) {
@@ -1723,12 +1725,15 @@
 
       const ownerBadge = document.getElementById('owner-badge');
       const ownerHint = document.getElementById('owner-hint');
+      const nudgeBtn = document.getElementById('nudge-btn');
       if (hasName && myName === state.owner) {
         ownerBadge.classList.remove('hidden');
         ownerHint.classList.remove('hidden');
+        if (nudgeBtn) nudgeBtn.classList.remove('hidden');
       } else {
         ownerBadge.classList.add('hidden');
         ownerHint.classList.add('hidden');
+        if (nudgeBtn) nudgeBtn.classList.add('hidden');
       }
 
       renderWhoami();
@@ -1773,6 +1778,18 @@
       myName = name;
       localStorage.setItem('bgs.myName', myName);
       renderAll();
+    }
+
+    // オーナーが押すと、まだ回答していない家族へLINEでやんわり催促を送る
+    async function nudgeMembers() {
+      if (myName !== state.owner) return;
+      if (!confirm('まだ回答していない家族に、LINEでやんわり催促を送ります。よろしいですか？\n（未入力の家族がいなければ送信されません）')) return;
+      const res = await syncMutation('nudge', { actor: myName }, { message: 'LINEに催促を送信中...' });
+      const r = res && res.nudgeResult;
+      if (r === 'sent') showToast('📣 未入力の家族にLINEで催促を送りました！');
+      else if (r === 'none') showToast('✅ みんな回答済みでした。催促は不要です');
+      else if (r === 'cooldown') showToast('⏳ 少し前に送ったばかりです。しばらく待ってね');
+      else showToast('📣 催促の送信を試みました');
     }
 
     // ============== TABS ==============

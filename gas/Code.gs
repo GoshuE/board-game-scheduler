@@ -3,6 +3,8 @@ const APP_KEY = '';
 const STATE_SHEET_NAME = 'State';
 const MEMBERS = ['郷朱', '彩乃', '純子', '政比呂', '未紗'];
 const OWNER = '郷朱';
+const APP_URL = 'https://goshue.github.io/board-game-scheduler/';
+// LINE通知の設定はコードに直書きせず、スクリプトプロパティ（LINE_TOKEN / LINE_GROUP_ID）に保存する
 
 function doGet(e) {
   const params = e && e.parameter ? e.parameter : {};
@@ -58,15 +60,41 @@ function handleAction_(params) {
     const date = validateDate_(params.date);
     const decided = params.decided === '1';
     const index = state.decidedDates.indexOf(date);
+    const isNewDecision = decided && index < 0;
     if (decided && index < 0) state.decidedDates.push(date);
     if (!decided && index >= 0) state.decidedDates.splice(index, 1);
     state.decidedDates.sort();
-    return saveAndOk_(state);
+    const result = saveAndOk_(state);
+    if (isNewDecision) notifyLine_(buildDecidedMessage_(date));
+    return result;
   }
 
   if (action === 'reset') {
     assertOwner_(params.actor);
     return saveAndOk_(defaultState_());
+  }
+
+  if (action === 'nudge') {
+    assertOwner_(params.actor);
+    const now = Date.now();
+    const last = Number(scriptProp_('LAST_NUDGE_TS')) || 0;
+    const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6時間：連打・第三者による無料枠枯渇を防ぐ
+    let nudgeResult;
+    if (now - last < COOLDOWN_MS) {
+      nudgeResult = 'cooldown';
+    } else {
+      const missing = membersWithNoUpcomingVotes_(state);
+      if (missing.length === 0) {
+        nudgeResult = 'none';
+      } else {
+        notifyLine_(buildNudgeMessage_(missing));
+        PropertiesService.getScriptProperties().setProperty('LAST_NUDGE_TS', String(now));
+        nudgeResult = 'sent';
+      }
+    }
+    const result = ok_(state);
+    result.nudgeResult = nudgeResult;
+    return result;
   }
 
   throw new Error('Unknown action');
@@ -193,4 +221,110 @@ function jsonp_(callback, payload) {
   const safeCallback = /^[A-Za-z_$][0-9A-Za-z_$]*$/.test(callback) ? callback : 'callback';
   const body = safeCallback + '(' + JSON.stringify(payload) + ');';
   return ContentService.createTextOutput(body).setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+// ============== LINE 通知 ==============
+function scriptProp_(key) {
+  return PropertiesService.getScriptProperties().getProperty(key) || '';
+}
+
+// LINEグループへメッセージを送る。トークン/グループID未設定なら何もしない（＝予定表本体は通常どおり動く）
+function notifyLine_(text) {
+  const token = scriptProp_('LINE_TOKEN');
+  const groupId = scriptProp_('LINE_GROUP_ID');
+  if (!token || !groupId) return;
+  try {
+    const res = UrlFetchApp.fetch('https://api.line.me/v2/bot/message/push', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { Authorization: 'Bearer ' + token },
+      payload: JSON.stringify({ to: groupId, messages: [{ type: 'text', text: text }] }),
+      muteHttpExceptions: true
+    });
+    const code = res.getResponseCode();
+    if (code < 200 || code >= 300) {
+      // 失敗を実行ログに残す（後から不達に気づけるように）
+      console.error('LINE push failed: ' + code + ' ' + res.getContentText());
+    }
+  } catch (err) {
+    // 通知の失敗で予定表の保存処理を止めない
+    console.error('LINE push error: ' + err);
+  }
+}
+
+function buildDecidedMessage_(date) {
+  return [
+    '🎲 ボドゲ会の開催日が決まりました！',
+    '📅 ' + formatDateJa_(date),
+    '',
+    'カレンダー空けておいてね〜',
+    APP_URL
+  ].join('\n');
+}
+
+function buildNudgeMessage_(missing) {
+  const names = missing.map(function (n) { return n + 'さん'; }).join('・');
+  return [
+    '🎲 ボドゲ会の日程調整、' + names + 'がまだ回答してないみたい！',
+    '空いてる日に ○ / △ を入れてね〜',
+    APP_URL
+  ].join('\n');
+}
+
+// 今日から21日以内に一度も○/△を入れていないメンバーを返す
+function membersWithNoUpcomingVotes_(state) {
+  const today = todayIso_();
+  const horizon = addDaysIso_(today, 21);
+  return state.members.filter(function (m) {
+    const dates = state.availability[m] || {};
+    return !Object.keys(dates).some(function (d) { return d >= today && d <= horizon; });
+  });
+}
+
+function todayIso_() {
+  return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+}
+
+function addDaysIso_(iso, days) {
+  const p = iso.split('-');
+  const dt = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  dt.setDate(dt.getDate() + days);
+  return Utilities.formatDate(dt, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+}
+
+function formatDateJa_(iso) {
+  const p = iso.split('-');
+  const m = Number(p[1]);
+  const d = Number(p[2]);
+  const dt = new Date(Number(p[0]), m - 1, d);
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  return m + '月' + d + '日(' + days[dt.getDay()] + ')';
+}
+
+// ============== LINE Webhook（グループIDの自動取得） ==============
+// セットアップ時だけ groupId を1回だけ自動取得する「ワンショット」方式。
+// 通常運用時は ALLOW_GROUP_CAPTURE が '1' でないため一切書き込まず、
+// 第三者が偽イベントを送っても通知先(LINE_GROUP_ID)を乗っ取れない。
+// 【使い方】スクリプトプロパティ ALLOW_GROUP_CAPTURE を '1' にしてからBotをグループに招待
+//   → 最初のグループイベントで LINE_GROUP_ID を保存し、ALLOW_GROUP_CAPTURE を自動で '0' に戻す。
+function doPost(e) {
+  try {
+    const props = PropertiesService.getScriptProperties();
+    // 取得モードが有効、かつ未設定のときだけ受け付ける
+    if (props.getProperty('ALLOW_GROUP_CAPTURE') === '1' && !props.getProperty('LINE_GROUP_ID')) {
+      const body = e && e.postData && e.postData.contents ? JSON.parse(e.postData.contents) : {};
+      const events = Array.isArray(body.events) ? body.events : [];
+      for (let i = 0; i < events.length; i++) {
+        const src = events[i] && events[i].source ? events[i].source : {};
+        if (src.type === 'group' && src.groupId) {
+          props.setProperty('LINE_GROUP_ID', src.groupId);
+          props.setProperty('ALLOW_GROUP_CAPTURE', '0'); // 1回取得したら自動でロック
+          break;
+        }
+      }
+    }
+  } catch (err) {
+    // Webhook検証や想定外のペイロードでも 200 を返す
+  }
+  return ContentService.createTextOutput(JSON.stringify({ ok: true })).setMimeType(ContentService.MimeType.JSON);
 }
