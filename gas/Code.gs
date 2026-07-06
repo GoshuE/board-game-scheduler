@@ -87,7 +87,7 @@ function handleAction_(params) {
       if (missing.length === 0) {
         nudgeResult = 'none';
       } else {
-        notifyLine_(buildNudgeMessage_(missing));
+        pushLine_([buildNudgeMessage_(missing)]);
         PropertiesService.getScriptProperties().setProperty('LAST_NUDGE_TS', String(now));
         nudgeResult = 'sent';
       }
@@ -228,8 +228,8 @@ function scriptProp_(key) {
   return PropertiesService.getScriptProperties().getProperty(key) || '';
 }
 
-// LINEグループへメッセージを送る。トークン/グループID未設定なら何もしない（＝予定表本体は通常どおり動く）
-function notifyLine_(text) {
+// LINEグループへメッセージ配列を送る。トークン/グループID未設定なら何もしない（＝予定表本体は通常どおり動く）
+function pushLine_(messages) {
   const token = scriptProp_('LINE_TOKEN');
   const groupId = scriptProp_('LINE_GROUP_ID');
   if (!token || !groupId) return;
@@ -238,7 +238,7 @@ function notifyLine_(text) {
       method: 'post',
       contentType: 'application/json',
       headers: { Authorization: 'Bearer ' + token },
-      payload: JSON.stringify({ to: groupId, messages: [{ type: 'text', text: text }] }),
+      payload: JSON.stringify({ to: groupId, messages: messages }),
       muteHttpExceptions: true
     });
     const code = res.getResponseCode();
@@ -252,6 +252,11 @@ function notifyLine_(text) {
   }
 }
 
+// シンプルなテキスト通知（実施日決定通知などメンション不要のもの）
+function notifyLine_(text) {
+  pushLine_([{ type: 'text', text: text }]);
+}
+
 function buildDecidedMessage_(date) {
   return [
     '🎲 ボドゲ会の開催日が決まりました！',
@@ -262,13 +267,34 @@ function buildDecidedMessage_(date) {
   ].join('\n');
 }
 
+// 名前→LINE userId のマップ（スクリプトプロパティ LINE_USER_IDS にJSONで保存）
+function getUserIdMap_() {
+  const raw = scriptProp_('LINE_USER_IDS');
+  if (!raw) return {};
+  try { return JSON.parse(raw); } catch (e) { return {}; }
+}
+
+// 未入力者への催促メッセージ（textV2）。userIdが分かる人は @メンション、不明な人は名前のみ。
 function buildNudgeMessage_(missing) {
-  const names = missing.map(function (n) { return n + 'さん'; }).join('・');
-  return [
-    '🎲 ボドゲ会の日程調整、' + names + 'がまだ回答してないみたい！',
+  const idMap = getUserIdMap_();
+  const substitution = {};
+  const parts = missing.map(function (name, i) {
+    const uid = idMap[name];
+    if (uid) {
+      const key = 'm' + i;
+      substitution[key] = { type: 'mention', mentionee: { type: 'user', userId: uid } };
+      return '{' + key + '}さん';
+    }
+    return name + 'さん';
+  });
+  const text = [
+    '🎲 ボドゲ会の日程調整、' + parts.join('・') + 'がまだ回答してないみたい！',
     '空いてる日に ○ / △ を入れてね〜',
     APP_URL
   ].join('\n');
+  const message = { type: 'textV2', text: text };
+  if (Object.keys(substitution).length > 0) message.substitution = substitution;
+  return message;
 }
 
 // 今日から21日以内に一度も○/△を入れていないメンバーを返す
@@ -339,7 +365,7 @@ function weeklyNudge() {
   var state = readState_();
   var missing = membersWithNoUpcomingVotes_(state);
   if (missing.length === 0) return; // 全員入力済みなら送らない
-  notifyLine_(buildNudgeMessage_(missing));
+  pushLine_([buildNudgeMessage_(missing)]);
   PropertiesService.getScriptProperties().setProperty('LAST_NUDGE_TS', String(now));
 }
 
