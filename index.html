@@ -1156,7 +1156,7 @@
   <!-- App bar -->
   <div class="app-bar">
     <div class="brand">
-      <img class="mascot-img brand-mascot" src="assets/bodomame-chan-header.png" alt="ボドまめちゃん">
+      <img class="mascot-img brand-mascot" id="top-mascot" src="assets/bodomame_top_01.png" alt="ボドまめちゃん">
       <div class="brand-copy">
         <h1>ボドまめちゃん</h1>
         <span class="brand-kicker">🎲 ボドゲ会、まめに決めよ！</span>
@@ -1699,10 +1699,22 @@
 
     function renderAll() {
       renderIdentityBar();
+      renderMonthlyTopImage();
       renderDecidedBanner();
       renderCalendar();
       renderScheduleTable();
       renderSuggestions();
+    }
+
+    function monthlyTopImageSrc(monthIndex) {
+      return `assets/bodomame_top_${String(monthIndex + 1).padStart(2, '0')}.png`;
+    }
+
+    function renderMonthlyTopImage() {
+      const img = document.getElementById('top-mascot');
+      if (!img) return;
+      img.src = monthlyTopImageSrc(displayedMonth.getMonth());
+      img.alt = `${displayedMonth.getMonth() + 1}月のボドまめちゃん`;
     }
 
     function renderIdentityBar() {
@@ -1837,6 +1849,7 @@
       const year = displayedMonth.getFullYear();
       const month = displayedMonth.getMonth();
       document.getElementById('month-label').textContent = `${year}年 ${month + 1}月`;
+      renderMonthlyTopImage();
 
       const firstDay = new Date(year, month, 1);
       const startDayOfWeek = firstDay.getDay();

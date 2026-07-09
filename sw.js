@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bodomame-scheduler-v13';
+const CACHE_NAME = 'bodomame-scheduler-v14';
 const APP_SHELL = [
   './',
   './index.html',
@@ -13,7 +13,19 @@ const APP_SHELL = [
   './assets/bodomame-chan-icon-think.png',
   './assets/bodomame-chan-icon-wait.png',
   './assets/bodomame-chan-icon.png',
-  './assets/bodomame-chan-main.png'
+  './assets/bodomame-chan-main.png',
+  './assets/bodomame_top_01.png',
+  './assets/bodomame_top_02.png',
+  './assets/bodomame_top_03.png',
+  './assets/bodomame_top_04.png',
+  './assets/bodomame_top_05.png',
+  './assets/bodomame_top_06.png',
+  './assets/bodomame_top_07.png',
+  './assets/bodomame_top_08.png',
+  './assets/bodomame_top_09.png',
+  './assets/bodomame_top_10.png',
+  './assets/bodomame_top_11.png',
+  './assets/bodomame_top_12.png'
 ];
 
 self.addEventListener('install', event => {
